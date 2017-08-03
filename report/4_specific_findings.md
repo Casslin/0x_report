@@ -21,25 +21,87 @@ A trivial case is `target` values >= 1000 will never indicate a rounding error: 
 
 1. As there's no other documentation about the system that describes factors such as desired behaviors of the system and the interaction of components and functions like `isRoundingError`, this issue has been classified `Critical` as users of a financial system should have defined and precise behavior. We recommend more documentation on `isRoundingError` including descriptions as they apply to presumably providing users with guarantees and protections, and the limits to those protections and when they will not hold. For example, if certain protections are only provided to users if they trade 1000+ tokens, then those should be clearly documented.
 
-2. We recommend [unit testing `isRoundingError`](https://github.com/0xProject/contracts/issues/92) and reimplementing the function if needed. Jim Berry, an engineer at ConsenSys, has created an implementation that is both elegant and readable:
+2. We recommend [unit testing `isRoundingError`](https://github.com/0xProject/contracts/issues/92) and reimplementing the function using the standard definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error) 
 
+**Resolution** 
+
+0x's first reimplementation of isRoundingError is below:
 ```
 function isRoundingError(uint numerator, uint denominator, uint target)
- constant
- returns (bool isError)
-{
- uint remainder = mulmod(target, numerator, denominator);
- // fractional error is (remainder / computed_partial_amount)
- // Because it's integer math, compute the reciprocal of the error and compare it to the reciprocal of
- // the max allowed fractional error.
- return ((remainder != 0) && (1000 > safeDiv( getPartialAmount( numerator, denominator, target), remainder)));
-}
+        public
+        constant
+        returns (bool)
+    {
+        if (mulmod(target, numerator, denominator) == 0) return false; // No rounding error.
+        // (numerator * target / denumerator) * 1000000
+        uint partialAmountWithErr = safeMul(getPartialAmount(numerator, denominator, target), 1000000);
+        // (numerator * target * 1000000 / denumerator)
+        uint partialAmountWithoutErr = safeDiv(
+            safeMul(
+                safeMul(numerator, target),
+                1000000
+            ),
+            denominator
+        );
+        uint errPercentageTimes1000 = safeDiv(
+            safeSub(partialAmountWithoutErr, partialAmountWithErr), // Absolute rounding error, times 1,000,000
+            safeDiv(partialAmountWithoutErr, 1000)                  // Amount being filled, times 1,000
+        );
+        return errPercentageTimes1000 > 1;
+    }: 
 ```
-This implementation simply calculates the remainder and then checks if the reciprocal of the error is less than the reciprocal of .1% (1000). We recommend further testing and adoption of this implementation.
+In 0x’s reimplementation `isRoundingError` first checks if there is a rounding error by using the mulmod opcode. It then calculates the partial amount the taker will receive with the error included (we need this to actually calculate the percent error). This value is then multiplied by 1,000,000 since we’re trying to solve:
 
-**Resolution**
+  (x - floor(x))/x <= .001 
+  
+  where x = fillTakerTokenAmount * (makerTokenAmount/takerTokenAmount) = the amount of makerToken the taker will receive. 
 
-0x reimplemented isRoundingError and created new unit tests for this function. Based on our findings the new implementation is correct, but we believe Jim Berry’s implementation is more straightforward and would result in gas savings.
+In Solidity, we cannot represent decimals so we multiply this entire expression by 1000 which gives us: 
+
+(1000x - 1000floor(x))/x <= 1. 
+
+However, the x in the denominator could still have a rounding error, thus we multiply the numerator and denominator by 1000 again which gives us 
+
+(1,000,000x - 1,000,000floor(x))/1000x <= 1. 
+
+This elucidates why we multiply by 1,000,000. Now, we estimate the amount the taker should receive without any error. We calculate this by performing this calculation: 
+
+filledTakerTokenAmount * makerTokenAmount * 1,000,000/takerTokenAmount. 
+
+(It's worth noting that we multiply by 1,000,000 before dividing to increase the precision of the calculation) 
+
+Now, that we have x and floor(x) the code calculates the error percentage (times 1000) by subtracting the partialAmountWithError from the partialAmountWIthoutError and dividing that by the partialAmountWithoutError*1000. It then checks if this value is > 1 (.1% * 1000). If so, there’s a rounding error and it returns true. 
+
+Shortly after this implementation 0x was able to simplify the logic significantly:
+```
+function isRoundingError(uint numerator, uint denominator, uint target)
+        public
+        constant
+        returns (bool)
+    {
+        uint remainder = mulmod(target, numerator, denominator);
+        if (remainder == 0) return false; // No rounding error.
+
+        uint errPercentageTimes1000 = safeDiv(
+            safeMul(remainder, 1000),
+            safeMul(numerator, target)
+        );
+        return errPercentageTimes1000 > 1;
+    }
+```
+In 0x’s final implementation of `isRoundingError`they were able to simplify the percent error formula to 
+
+R/(fillTakerTokenAmount * makerTokenAmount) <= .001 
+
+where R = (fillTakerTokenAmount * makerTokenAmount)%takerTokenAmount = the remainder of the calculation. 
+
+Multiplying each side by 1000 yields
+
+1000 * R/(fillTakerTokenAmount*makerTokenAmount) <= 1.
+
+And if the calculation is greater than 1 there's a rounding error greater than .1% and the function returns true.
+
+Furthermore, 0x thoroughly [tested](https://github.com/0xProject/contracts/blob/ad79fb669bec3ed431ff4745e978c1535ca82eae/test/ts/exchange/helpers.ts) the `isRoundingError` function and included multiple edge cases.
 <br/><br/><br/>
 
 ## 4.2 Major
