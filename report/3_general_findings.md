@@ -25,6 +25,8 @@ A possible approach would be `require()` that tokens are registered in the `Toke
 **JM TODO: I have followed up with 0x about how they would like to address this.**
 <br/><br/><br/>
 
+
+
 ### 3.2.2 Front Running
 
 Miners have ultimate control over transaction ordering and inclusion of transactions on the Ethereum Blockchain. This means that miners are ultimately able to decide which transactions are filled or canceled. Given this inherent power of miners it opens up a possible form of market manipulation: Front running. Front running is the practice of entering into a trade with knowledge of a transaction that will influence the price of the underlying asset or security.
@@ -38,12 +40,16 @@ Additionally, given the nature of blockchains, miners are not the only ones able
 Although it is difficult to solve front running problems on a blockchain, 0x has spent a lot of time pondering this problem, and have come up with some impressive solutions to combat front running. Some methods they came up with include a matching model where a relayer only accepts orders that specify the relayer as the taker (this prevents front running as only the relayer can fill the order), a deposit contract model where relayers can create a custom deposit contract that only accepts orders that specify the deposit contract as a taker and then this contract can implement functionality on top of `fillOrder`, and an orderTypes parameter to the message format that will allow for orders with varying functionality that can potentially prevent or disincentivize front running.
 <br/><br/><br/>
 
-### 3.2.3 Lack of specifications and documentation
+
+
+### JC 3.2.3 Lack of specifications and documentation
 
 Ref: [Best Practices: specifications and documentation](https://github.com/ConsenSys/smart-contract-best-practices#security-related-documentation-and-procedures)
 
 There is a lack of documentation, with many interactions and components of the system not covered at all in the white paper.  The [critical issue of rounding](../4_specific_findings.md#41-critical) lacks a specification and originally had [no tests](https://github.com/0xProject/contracts/issues/92). Another example is the [Token Distribution contract](#description-token-distribution). Furthermore, it may be preferable for the system to be more codified and deterministic than being dependent on centralized actions such as where the timing is essentially arbitrary.
 <br/><br/><br/>
+
+
 
 ### GL/JC 3.2.4 Rounding of numbers
 
@@ -65,6 +71,7 @@ In 0x’s [reimplementation](https://github.com/0xProject/contracts/pull/132/com
 Another point worth mentioning, due to rounding errors, are unfillable orders. Unfillable orders arise when all potential fills result in too high of a rounding error, so the order is essentially bricked. An example of such an order is outlined below.
 
 Alice creates an order of 1001 token A for 3 token B. Bob then fills this order with fillTakerTokenAmount = 2. This order only has a .05% error, so the order goes through without any problems. However, now if any other taker tries to fill the remaining 1 token B `isRoundingError` will always return true as it has a .19% error. Now, this order is in a perpetual limbo and will waste potential takers' gas until Alice cancels the order. 
+<br/><br/><br/>
 
 
 
