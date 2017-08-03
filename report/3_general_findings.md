@@ -38,12 +38,11 @@ Additionally, given the nature of blockchains, miners are not the only ones able
 Although it is difficult to solve front running problems on a blockchain, 0x has spent a lot of time pondering this problem, and have come up with some impressive solutions to combat front running. Some methods they came up with include a matching model where a relayer only accepts orders that specify the relayer as the taker (this prevents front running as only the relayer can fill the order), a deposit contract model where relayers can create a custom deposit contract that only accepts orders that specify the deposit contract as a taker and then this contract can implement functionality on top of `fillOrder`, and an orderTypes parameter to the message format that will allow for orders with varying functionality that can potentially prevent or disincentivize front running.
 <br/><br/><br/>
 
-### GS 3.2.3 Lack of specifications and documentation
+### 3.2.3 Lack of specifications and documentation
 
-Ref: [ Best Practices: specifications and documentation](https://github.com/ConsenSys/smart-contract-best-practices#security-related-documentation-and-procedures)
+Ref: [Best Practices: specifications and documentation](https://github.com/ConsenSys/smart-contract-best-practices#security-related-documentation-and-procedures)
 
-<!-- Goncalo -->
-There is a lack of documentation, with many interactions and components of the system not covered at all in the white paper.  Examples include [rounding calculations](https://github.com/0xProject/contracts/issues/98) and the [Token Distribution contract](#description-token-distribution). Furthermore, it may be preferable for the system to be more codified and deterministic than being dependent on centralized actions such as where the timing is essentially arbitrary.
+There is a lack of documentation, with many interactions and components of the system not covered at all in the white paper.  The [critical issue of rounding](../4_specific_findings.md#41-critical) lacks a specification and originally had [no tests](https://github.com/0xProject/contracts/issues/92). Another example is the [Token Distribution contract](#description-token-distribution). Furthermore, it may be preferable for the system to be more codified and deterministic than being dependent on centralized actions such as where the timing is essentially arbitrary.
 <br/><br/><br/>
 
 ### GL/JC 3.2.4 Rounding of numbers
