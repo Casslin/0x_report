@@ -1,14 +1,15 @@
 
+# 1. Summary of the Audit process and methods
 
-## 2.2 Materials Included in Audit
-<!-- ^ Needs a better section name -->
-<!-- Can we use the word 'audit?' Need to ask Matt Corva. -->
+## 1.1 Scope
 
 ### Source code 
 
-The code audited was from the [0xProject/contracts](https://github.com/0xProject/contracts/tree/888d5a02573572240f4c55e03238be603c13c469) repository (*frozen* branch).
+The code base audited was the HEAD of the *frozen* branch in the  [0xProject/contracts](https://github.com/0xProject/contracts/tree/888d5a02573572240f4c55e03238be603c13c469) repository.
 
 The state of the source code at the time of the audit can be found under the commit hash [`888d5a02573572240f4c55e03238be603c13c469`](https://github.com/0xProject/contracts/tree/888d5a02573572240f4c55e03238be603c13c469).
+
+Revisions made after the audit can be found in the *frozenUpdated* branch under **SPECIFIC COMMIT HASH**.
 
 ### Documentation
 
@@ -32,7 +33,7 @@ The revised code base now includes the script `npm run testrpc`,
 <br/><br/><br/>
 
 
-## 2.3 Audit Goals
+## 2.2 Audit Goals
 
 The focus of our audit was to ensure the following properties:
 
@@ -44,7 +45,7 @@ contract and within the system of contracts.
 evaluation of the architecture of this system through the lens of established smart contract best practices and general software best practices.
 
 **Code Correctness and Quality**:
-a full review of the contract source code.  The primary areas of focus include:
+A full review of the contract source code.  The primary areas of focus include:
 
 * Correctness (does it do was it is supposed to do)
 * Readability (How easily it can be read and understood)
