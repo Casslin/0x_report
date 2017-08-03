@@ -230,7 +230,7 @@ c59b967d6f5c2f3f3b66ffe5a4ed26812cb57aea13f1b9ba087f44bcd79a31f0  base/StandardT
 b3c224de95d004db90477fc9034c4e68afcc4679c93dfa9da3003bd44e0fe471  base/Token.sol
 ```
 
-# Appendix 5
+# Appendix 4
 
 ## Description of Token Distribution
 
