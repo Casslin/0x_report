@@ -1,4 +1,3 @@
-
 # 1. Summary of the Audit process and methods
 
 ## 1.1 Scope

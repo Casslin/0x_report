@@ -1,4 +1,4 @@
-# 4 Test Coverage Analysis
+# 5 Test Coverage Analysis
 
 Testing is implemented using the Truffle Framework.
 

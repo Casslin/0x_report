@@ -13,6 +13,7 @@ Important to note that any thorough audit will result in some finding of at leas
 
 * [1. Summary of the Audit process and methods](./report/1_process.md)
 * [2. Description of the 0x contract system functions](./report/2_system_overview.md)
-* [3. General and Specific Findings](./report/3_findings.md)
-* [4. Test Coverage Analysis](./report/4_coverage.md)
-* [5. Appendix](./report/5_appendix.md)
+* [3. General Findings](./report/3_general_findings.md)
+* [4. Specific Findings](./report/4_specific_findings.md)
+* [5. Test Coverage Analysis](./report/5_coverage.md)
+* [6. Appendix](./report/6_appendix.md)

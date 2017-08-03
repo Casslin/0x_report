@@ -1,4 +1,4 @@
-# Appendix - Description of Token Distribution
+# 6 Appendix - Description of Token Distribution
 
 The token distribution is an aspect of the 0x system with little documentation. The following describes our understanding of it.
 
