@@ -2,9 +2,9 @@ From July 3 through July 21 of 2017, ConsenSys Diligence conducted a security au
 
 ## Contents:
 
-* [1. Summary of the Audit process and methods](./1_process.md)
-* [2. Description of the 0x contract system functions](./2_system_overview.md)
-* [3. Challenges of decentralized exchanges](./3_challenges.md)
-* [4. General and Specific Findings](./4_findings.md)
-* [5. Test Coverage Analysis](./5_coverage.md)
-* [6. Appendix](./6_appendix.md)
+* [1. Summary of the Audit process and methods](./report/1_process.md)
+* [2. Description of the 0x contract system functions](./report/2_system_overview.md)
+* [3. Challenges of decentralized exchanges](./report/3_challenges.md)
+* [4. General and Specific Findings](./report/4_findings.md)
+* [5. Test Coverage Analysis](./report/5_coverage.md)
+* [6. Appendix](./report/6_appendix.md)
