@@ -57,6 +57,17 @@ We recommend re-implementing `isRoundingError`, using the definition of [approxi
 **Resolution**
 
 In 0x’s [reimplementation](https://github.com/0xProject/contracts/pull/132/commits/c1c4befeac352eaa144cc9c2185e618bea505c82) of `isRoundingError`, they were able to simplify the rounding error calculation, [using some mathematical magic](https://www.wolframalpha.com/input/?i=((a*b%2Fc)+-+floor(a*b%2Fc))+%2F+(a*b%2Fc)+%3D+((a*b)%25c)%2F(a*b)) this leads to a much more elegant and straightforward implementation, while also reducing gas costs for the takers. Additionally, the 0x team added [unit tests](https://github.com/0xProject/contracts/pull/129/files#diff-e1e51de7476e0cab7ae50ddcbd4c0ff1R105) to the `isRoundingError` function and have included boundary tests.
+<br/><br/><br/>
+
+
+
+### Unfillable Orders
+
+Another point worth mentioning, due to rounding errors, are unfillable orders. Unfillable orders arise when all potential fills result in too high of a rounding error, so the order is essentially bricked. An example of such an order is outlined below.
+
+Alice creates an order of 1001 token A for 3 token B. Bob then fills this order with fillTakerTokenAmount = 2. This order only has a .05% error, so the order goes through without any problems. However, now if any other taker tries to fill the remaining 1 token B `isRoundingError` will always return true as it has a .19% error. Now, this order is in a perpetual limbo and will waste potential takers' gas until Alice cancels the order. 
+
+
 
 ## 3.3 Medium
 
