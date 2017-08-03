@@ -34,7 +34,7 @@ The revised code base now includes the script `npm run testrpc`,
 <br/><br/><br/>
 
 
-## 2.2 Audit Goals
+### Audit Goals
 
 The focus of our audit was to ensure the following properties:
 
