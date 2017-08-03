@@ -46,7 +46,9 @@ Although it is difficult to solve front running problems on a blockchain, 0x has
 
 Ref: [Best Practices: specifications and documentation](https://github.com/ConsenSys/smart-contract-best-practices#security-related-documentation-and-procedures)
 
-There is a lack of documentation, with many interactions and components of the system not covered at all in the white paper.  The [critical issue of rounding](../4_specific_findings.md#41-critical) lacks a specification and originally had [no tests](https://github.com/0xProject/contracts/issues/92). Another example is the [Token Distribution contract](#description-token-distribution). Furthermore, it may be preferable for the system to be more codified and deterministic than being dependent on centralized actions such as where the timing is essentially arbitrary.
+There is a lack of documentation, with many interactions and components of the system not covered at all in the white paper.  The [critical issue of rounding](../4_specific_findings.md#41-critical) lacks a specification and originally had [no tests](https://github.com/0xProject/contracts/issues/92).  Without a specification, it is ambiguous what is correct and desired behavior.
+
+Another example is the [Token Distribution contract](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol). Furthermore, it may be preferable for the system to be more codified and deterministic than being dependent on centralized actions such as where the timing is essentially arbitrary.
 <br/><br/><br/>
 
 
