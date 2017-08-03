@@ -75,7 +75,7 @@ _After our intial audit, this contract was renamed to `TokenSale` for clarity._
 
 ## `MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress`
 
-This contract is an extension of the popular and well audited [Gnosis Multisig-Wallet](https://github.com/0xProject/contracts/commit/e51d4dcb4c8e0d93815e9d2a5c511d60ce017870), which adds two features.
+This contract add two features to the [Gnosis Multisig-Wallet](https://etherscan.io/address/0x851b7f3ab81bd8df354f0d7640efcd7288553419#code).
 
 One is a time lock, which adds a minimum time delay of `secondsTimeLocked` between the submission and execution of any transaction, this feature is implemented in `MultiSigWalletWithTimeLock.sol`.
 
