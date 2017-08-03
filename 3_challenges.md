@@ -1,4 +1,3 @@
-
 ### Overview of findings
 
 <!-- Discussion of general impressions, and most important risk factors -->

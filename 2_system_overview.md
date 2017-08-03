@@ -1,10 +1,21 @@
-### Overview and description of the contract system
+# Overview and description of the contract system
 
 For readers not familiar with the inner working of the 0xProject's contract system, we provide a brief summary which we hope will provide greater context for understanding this report.
 
-The contract system examined in this audit forms the core of the 0x Protocol, for on-chain trading of ERC-20 compatible tokens.
+The contract system examined in this audit forms the core of the 0x Protocol, for on-chain trading of ERC-20 compatible tokens. The system is deployed as 5 contracts, outlined below.
 
-#### Exchange
+<!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [`Exchange`](#exchange)
+- [`Proxy`](#proxy)
+- [`TokenRegistry`](#tokenregistry)
+- [`TokenDistributionWithRegistry`](#tokendistributionwithregistry)
+- [`MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress`](#multisigwalletwithtimelockexceptremoveauthorizedaddress)
+
+<!-- /TOC -->
+
+
+## `Exchange`
 
 The `Exchange` contract is the primary interface for users to trade through the 0x protocol, and provides a number of `public` functions which can be used to match or cancel orders.
 
@@ -20,7 +31,7 @@ The basic flow for completing an order is:
 
 Our investigation looked at several risks associated with this contract, including reentrancy, griefing, front running, and rounding errors, which are discussed later in this report.
 
-#### `Proxy`
+## `Proxy`
 
 The `Proxy` is the central contract in the system. Traders must `approve()` it to spend a sufficient amount of their token to successfully complete an order.
 
@@ -30,7 +41,7 @@ This `authorities` array can be updated by the `Proxy`'s `owner` address, making
 
 Thus the `Proxy` is the least changeable component in the system, and is necessarily simple in nature. _After our initial audit, this contract was renamed to `TokenTransferProxy` for clarity._
 
-#### `TokenRegistry`
+## `TokenRegistry`
 
 The `TokenRegistry` contract contains a curated list of contract addresses for popular, existing ERC-20 tokens, as well as related metadata including the name, ticker symbol, and a storage hash for the logo on both Swarm and IPFS. This token metadata is used to populate the UI developed by the 0xProject team.
 
@@ -38,7 +49,7 @@ It owned and controlled by single address (see Governance below), which can add 
 
 The `TokenRegistry` is separate from the core business logic of the protocol, and supports the use of the system's UI designed by the 0xProject team.  The protocol is not limited to tokens listed in the registry, and users are free to specify other tokens for exchange. It is not truly a part of the protocol, but has some curatorial influence on which tokens are likely to be traded most often.
 
-#### `TokenDistributionWithRegistry`
+## `TokenDistributionWithRegistry`
 
 This contract takes a novel approach to the `ZRX` token sale, by making use of the 0x protocol itself, but also obscuring that fact from the end user so that the process closely resembles the format of other recent token sales.
 
@@ -62,7 +73,7 @@ The mechanism of the sale looks like this:
 
 _After our intial audit, this contract was renamed to `TokenSale` for clarity._
 
-#### `MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress`
+## `MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress`
 
 This contract is an extension of the popular and well audited [Gnosis Multisig-Wallet](https://github.com/0xProject/contracts/commit/e51d4dcb4c8e0d93815e9d2a5c511d60ce017870), which adds two features.
 
