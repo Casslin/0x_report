@@ -4,7 +4,7 @@
 
 ### Source code 
 
-The code base audited was the HEAD of the *frozen* branch in the  [0xProject/contracts](https://github.com/0xProject/contracts/tree/888d5a02573572240f4c55e03238be603c13c469) repository.
+The code base audited was the *frozen* branch in the  [0xProject/contracts](https://github.com/0xProject/contracts/tree/888d5a02573572240f4c55e03238be603c13c469) repository.
 
 The state of the source code at the time of the audit can be found under the commit hash [`888d5a02573572240f4c55e03238be603c13c469`](https://github.com/0xProject/contracts/tree/888d5a02573572240f4c55e03238be603c13c469).
 
