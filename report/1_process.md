@@ -23,7 +23,7 @@ The following documentation was available to the review team:
 
 The pre-existing tests for [0xProject/contracts](https://github.com/0xProject/contracts/tree/frozen) repository were executed using the truffle framework, run against contracts deployed on a local instance of testrpc.
 
-In order for the tests to succeed, the module `ethereumjs-testrpc` had to be uninstalled and reinstalled specifying version `3.0.2`. [TODO cf the minor item about tests]
+In order for the tests to succeed, the module `ethereumjs-testrpc` had to be uninstalled and reinstalled specifying version `3.0.2`.
 
 ```
 $ npm uninstall -g ethereumjs-testrpc
@@ -31,8 +31,6 @@ $ npm install -g ethereumjs-testrpc@3.0.2
 ```
 
 The revised code base now includes the script `npm run testrpc`,
-<br/><br/><br/>
-
 
 ### Audit Goals
 
