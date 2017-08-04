@@ -57,11 +57,21 @@ Another example is the [Token Distribution contract](https://github.com/0xProjec
 
 
 
-### GL/JC 3.2.4 Rounding of numbers
+### 3.2.4 Rounding of numbers
 
-Given the 0x protocol allows for partial fills, rounding errors are extremely pertinent to the protocol as they can act as a large hidden cost to takers and ultimately result in the loss of tokens. Rounding errors affect partial fills where R = (fillTakerTokenAmount*makerTokenAmount)%takerTokenAmount does not equal 0, and increases linearly as the remainder increases. Furthermore, since the EVM does not support floating point numbers rounding errors need to be approximated. However, the precision of this approximation can be increased by multiplying the remainder (i.e - multiplying the remainder by 10 increases the precision by 1 decimal point). 0x’s original implementation of the `isRoundingError` function: `return (target < 10**3 && mulmod(target, numerator, denominator) != 0);` incorrectly assumed that if the order’s makerTokenAmount is greater than 1000 there will never be a rounding error greater than .1%. An obvious counterexample is a trade where order.makerTokenAmount is 1001, order.takerTokenAmount is 17, and fillTakerTokenAmount is 1. The rounding error here is (58.8823529 - 58)/58 = 1.5%, yet `isRoundingError` returns false.
+Given the 0x protocol allows for partial fills, rounding errors are extremely pertinent to the protocol as they can act as a large hidden cost to takers and ultimately result in the loss of tokens. Rounding errors affect "partial fills", ie. when the remainder (`(fillTakerTokenAmount*makerTokenAmount)%takerTokenAmount`) does not equal 0, and increases linearly as the remainder increases. Furthermore, since the EVM does not support floating point numbers rounding errors need to be approximated. However, the precision of this approximation can be increased by multiplying the remainder (i.e - multiplying the remainder by 10 increases the precision by 1 decimal point).
 
-**Reccomendation**
+0x’s [original implementation of the `isRoundingError`](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Exchange.sol#L477) function was
+
+```
+  return (target < 10**3 && mulmod(target, numerator, denominator) != 0);
+```
+
+which incorrectly assumed that if the `order.makerTokenAmount` is greater than 1000 there will never be a rounding error greater than .1%.
+
+A counterexample to this is a trade where `order.makerTokenAmount` is 1001, `order.takerTokenAmount` is 17, and `fillTakerTokenAmount` is 1; in which case the rounding error is ``(58.8823529 - 58)/58 = 1.5%``, yet `isRoundingError` returns false.
+
+**Recommendation**
 
 We recommend re-implementing `isRoundingError`, using the definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error) and creating thorough unit tests that include boundary conditions such as a .09% error, a .1% error, and a .11% error. For instance, orders where a taker purchases 10000 token A, but only receives 9989 token A, 9990 token A, or 9991 token A. We also believe it would be valuable to garner feedback from the community and future users of the protocol on what an appropriate error threshold is.
 
