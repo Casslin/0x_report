@@ -235,11 +235,10 @@ b3c224de95d004db90477fc9034c4e68afcc4679c93dfa9da3003bd44e0fe471  base/Token.sol
 
 # Appendix 4
 
+As a detailed specification was lacking during our initial review; the following plain english descriptions were written during the review process as an exercise to process and understand the contract logic.
+
 ## Description of Token Distribution
 
-As a detailed specification was lacking during our initial review; the following plain english description was written during the review process as an exercise to process and understand the contract logic.
-
-```markdown
 The token distribution is an aspect of the 0x system with little documentation. The following describes our understanding of it.
 
 The TokenDistributionWithRegistry (TD) contract's purpose is to create a single massive order that will be filled by those wanting to obtain ZRX.  The TD is the public's first chance at obtaining ZRX.  The TD's single order will specify a makerToken of ZRX, and a takerToken of EthToken (ETH which has been tokenized as ERC-20).
@@ -259,13 +258,9 @@ fillOrderWithEth() should not be called by arbitrary contracts that do not have 
 The owners of TD set an ethCapPerAddress, and this limits how much ETH can be exchanged for ZRX by a particular caller.  Excess ETH is sent back to the caller.  Caller cumulative contributions are tracked.  The owners can set ethCapPerAddress to whatever value at any time.
 
 Also, at any time, the owners can enable and disable the addresses that can call fillOrderWithEth().
-```
 
 ## Description of Exchange
 
-As a detailed specification was lacking during our initial review; the following plain english description was written during the review process as an exercise to process and understand the contract logic.
-
-```markdown
 The Exchange contract (EC) is the core implementation of the 0x protocol.
 
 The primary functions it provides are:
@@ -304,4 +299,3 @@ If a feeRecipient is specified, the specified maker and taker fees are paid by e
 Fees are always in amounts of ZRX.
 
 Rounding behavior is either unspecified or is an issue https://github.com/0xProject/contracts/issues/98
-```
