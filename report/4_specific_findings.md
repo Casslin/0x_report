@@ -277,15 +277,15 @@ The modifiers `nameDoesNotExist` and `symbolDoesNotExist` were added. These impl
 
 ### `setCapPerAddress()` can be changed by the owner at any time [[issues/84]](https://github.com/0xProject/contracts/issues/84)
 
-As there was no specification at the time of our initial review, it was not clear whether this is intended behavior. In past token sales, typically there are restrictions in code on when terms of the sale can be modified: for example, an obvious one would be to not allow the capPerAddress to be changed by anyone once the sale has started.
+As there was no specification at the time of our review, it was not clear whether this is intended behavior. In past token sales, typically there are restrictions in code on when terms of the sale can be modified: for example, an obvious one would be to not allow the capPerAddress to be changed by anyone once the sale has started.
 
 **Recommendation**
 
-Clarify the intended design.
+Remove (or minimize) arbitrary actions and enforce them in code.  Prefer code and algorithms over user and centralized actions.  It is preferable for the system to be more codified and deterministic than being dependent on centralized actions where the timing is essentially arbitrary.  The timing can be arbitrary because there is no code that guarantees that the cap will increase; furthermore, at times of heavy network congestion there are no guarantees that the transaction increasing the cap will be mined by a desired time.
 
 **Resolution**
 
-Fixed: The `setCapPerAddress()` function was replaced with `getEthCapPerAddress()` in [pull/108](https://github.com/0xProject/contracts/pull/108/commits/f56e3fdeaf741beadb3a6f655b49e71ba718e1c3#diff-9f72358cf6a5cd5763f962f132d50481R228). The new function increases the cap each day that passes. We have reviewed the new code and found no safety issues.
+Fixed. The `setCapPerAddress()` function was replaced with `getEthCapPerAddress()` in [pull/108](https://github.com/0xProject/contracts/pull/108/commits/f56e3fdeaf741beadb3a6f655b49e71ba718e1c3#diff-9f72358cf6a5cd5763f962f132d50481R228). The new function algorithmically increases the cap each day that passes. We have reviewed the new code and found no safety issues.
 <br/><br/><br/>
 
 ### Enforce invariants with `assert` instead of `safeMath` when appropriate
