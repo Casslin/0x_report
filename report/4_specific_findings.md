@@ -195,9 +195,7 @@ This was addressed in [pull/117](https://github.com/0xProject/contracts/pull/117
 
 ## 4.3 Medium
 
-### Require callers of Exchange to use token amounts > 0
-
-* https://github.com/0xProject/contracts/issues/101
+### Require callers of Exchange to use token amounts > 0 [issues/101](https://github.com/0xProject/contracts/issues/101)
 
 Callers of functions on `Exchange.sol` can fill and cancel orders for 0 tokens. This would lead to spurious [`ERROR_ORDER_FULLY_FILLED_OR_CANCELLED` logs](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Exchange.sol#L142).
 
@@ -221,10 +219,9 @@ https://github.com/0xProject/contracts/commit/f3778d25455e1f947eb7b25e921677f91a
 
 <br/><br/><br/>
 
-### Incorrectly named constructor in `ZRXToken` contract [[issues/88]]
-(https://github.com/0xProject/contracts/issues/88)
-The constructor name was not u
-pdated during a previous change when the ZRXToken was renamed.
+### Incorrectly named constructor in `ZRXToken` contract [issues/88](https://github.com/0xProject/contracts/issues/88)
+
+The constructor name was not updated during a previous change when the ZRXToken was renamed.
 
 **Recommendation**
 
