@@ -184,7 +184,13 @@ An issue with the implementation of `ecrecover()` solidity compiler was recently
 
 #### Recommendation
 
-Upgrade all contracts to solidity 0.4.14.
+Exchange.sol uses `ecrecover` to validate orders and during its deployment we recommend it be compiled with 0.4.14: there is no time to thoroughly debug to ascertain if this is actually needed.  For the rest of the system, a qualitative evaluation of the benefits of jumping to a week-old 0.4.14 compiler, do not seem to outweigh the risks of potential compiler bugs introduced in 0.4.12, 0.4.13, and 0.4.14.
+
+We do not recommend any permanent code changes as Truffle currently does not support running parallel versions of the Solidity compiler.
+
+There is no documentation about the deployment process, but it appears that Exchange.sol is [currently deployed](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/migrations/4_configure_proxy.ts#L23) near the end of the process, so it should be possible to ignore the Exchange.sol contract that is deployed with 0.4.11 by Truffle.  An out-of-band compile with 0.4.14 and deploying Exchange.sol, and then calling `tokenTransferProxy.addAuthorizedAddress` with it, should allow the system to function as intended.  The deployment of TokenSale.sol should also reference the 0.4.14 Exchange.sol.  We recommend these steps be documented.
+
+TokenSale.sol also uses `ecrecover`, but it is only active for the duration of the sale and we think the risks are acceptable for it to remain on 0.4.11.  Exchange.sol and TokenSale.sol are the only two contracts that use `ecrecover`.
 
 #### Resolution
 
