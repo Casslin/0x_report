@@ -97,6 +97,9 @@ https://github.com/0xProject/contracts/tree/888d5a02573572240f4c55e03238be603c13
 On July 28, the 0x team presented the following updated system, which ConsenSys Diligence used to report resolutions:
 https://github.com/0xProject/contracts/tree/e51d4dcb4c8e0d93815e9d2a5c511d60ce017870
 
+It was discovered that some fixes were incomplete, as well as other improvements recommended, and on August 3, the 0x team presented, for the purposes of this report, the final system:
+https://github.com/0xProject/contracts/tree/74728c404a1c7e9091074bd88abf454fd374228a
+
 ## A3.2 Static Analysis of Project's Files
 
 ### A3.2.1 File Count
