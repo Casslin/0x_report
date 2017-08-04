@@ -162,7 +162,7 @@ This is not only much more efficient (saves approximately 2/3 of the original fu
 
 **Resolution**
 
-* https://github.com/0xProject/contracts/pull/114
+Fixed in [pull/114](https://github.com/0xProject/contracts/pull/114)
 
 Verbatim used by @abandeali1 to justify not implementing the recommendation given:
 
@@ -174,11 +174,13 @@ After internal discussions, we have decided to go for code clarity over efficien
 We feel the need to note that the wording "(...) clarity over efficiency (...)" is, in our view, debatable and not representative of the whole truth as there's also the security topic touched in the recommendation corpus above but respect the 0x's team final decision as we understand that it is more difficult to trust code not made in-house.
 <br/><br/><br/>
 
-### Proper usage of [`require` vs `assert`](https://github.com/ConsenSys/smart-contract-best-practices#use-assert-and-require-properly)
+### Proper usage of `require` vs `assert`
 
 Use of the `assert` function should be limited to checking for states and error conditions which should be unreachable if properly designed. The `require` function should be used to validate  inputs, contract state, or return values from calls to external contracts.
 
 Another important difference is that `require` compiles to the `REVERT` opcode (`0xfd`), which will refund unused gas after the [Metropolis Release](https://github.com/ethereum/EIPs/pull/206).
+
+Ref: [`require` vs `assert`](https://github.com/ConsenSys/smart-contract-best-practices#use-assert-and-require-properly)
 
 **Recommendation**
 
@@ -358,9 +360,7 @@ This has been fixed: https://github.com/0xProject/contracts/pull/99
 https://github.com/0xProject/contracts/commit/efdba3dfdf29585ddeca39a452c16e197f2c7f46#diff-9f72358cf6a5cd5763f962f132d50481
 <br/><br/><br/>
 
-### Explicitly mark visibilities
-
-* https://github.com/0xProject/contracts/issues/93
+### Explicitly mark visibilities [[issues/93]](https://github.com/0xProject/contracts/issues/93)
 
 [Explicitly marking visibility](https://github.com/ConsenSys/smart-contract-best-practices#explicitly-mark-visibility-in-functions-and-state-variables) in functions and state variables makes it easier to catch and reason about incorrect assumptions about who can call a function or access a variable. The recent parity multisig exploit highlights the necessity of this.
 
@@ -370,7 +370,7 @@ Add visibility specifiers for all state variables and functions.
 
 **Resolution**
 
-Fixed in https://github.com/0xProject/contracts/commit/ed92920502ca637c7ea6ff071ad85e28ae56aa94
+Fixed in [pull/99](https://github.com/0xProject/contracts/pull/99).
 <br/><br/><br/>
 
 
@@ -414,16 +414,14 @@ with `uint filledTakerTokenAmount` would make the code more clear, explicit, and
 
 **Resolution**
 
-Fixed in https://github.com/0xProject/contracts/commit/f47ee8afff485c5ca3cacf242c0fbbf5221f3c54
+Fixed in [pull/117](https://github.com/0xProject/contracts/pull/117/commits/473e4d38b54ab77d5642bf0da6e7bd33b205fed1)
 
 The fix in [`cancelOrder`](https://github.com/0xProject/contracts/commit/f47ee8afff485c5ca3cacf242c0fbbf5221f3c54#diff-a5e6c43f03b96911facdf9d4e9b82b9cL224) illustrates the recommendation's benefits.
 
 It turned out that the actual example in the recommendation could not be performed due to EVM stack limits and it was essential to [add the named return back](https://github.com/0xProject/contracts/commit/5972561e916d9110f2de6d4b7af3ed27f773ab34).
 <br/><br/><br/>
 
-### Zero tests for `Exchange::batchFillOrKillOrders()`
-
-* https://github.com/0xProject/contracts/issues/116
+### Zero tests for `Exchange::batchFillOrKillOrders()` [[issues/116]](https://github.com/0xProject/contracts/issues/116)
 
 https://github.com/0xProject/contracts/blob/frozen/test/ts/exchange/wrapper.ts
 has no test/s for `batchFillOrKillOrders()`
@@ -435,15 +433,13 @@ Add one or more tests with usage and values similar to how `batchFillOrKillOrder
 
 **Resolution**
 
-A test was added https://github.com/0xProject/contracts/pull/133/commits/a0b60198e29b62b2b242e4e744c446239bb8e8d5#diff-9be78ea0202647bb62f62111374c3ecaR190.  The correctness and rigor was not evaluated due to time constraints.
+A test was added in [pull/133](https://github.com/0xProject/contracts/pull/133/commits/a0b60198e29b62b2b242e4e744c446239bb8e8d5#diff-9be78ea0202647bb62f62111374c3ecaR190).  The correctness and rigor was not evaluated due to time constraints.
 
 <br/><br/><br/>
 
 
 
-### Use `keccak256` instead of `sha3`
-
-https://github.com/0xProject/contracts/issues/77
+### Use `keccak256` instead of `sha3` [  [issues/77]](https://github.com/0xProject/contracts/issues/77)
 
 In Solidity, there's no difference between the two, except that `keccak256` is accurate and will not mislead new or casual observers about which hash algorithm is being executed (since the standardized SHA-3 is slightly different from Keccak-256).
 
@@ -463,9 +459,7 @@ Unfortunately, there is still an occurrence: https://github.com/0xProject/contra
 
 
 
-### No event when TokenTransferProxy `transferOwnership` occurs
-
-https://github.com/0xProject/contracts/issues/147
+### No event when TokenTransferProxy `transferOwnership` occurs [[issues/147]](https://github.com/0xProject/contracts/issues/147)
 
 When `transferOwnership` occurs, an event may be desirable for user interfaces, monitoring services, as well as blockchain explorers.
 
@@ -481,9 +475,7 @@ None (in fairness to the 0x team, this was reported after they provided a final 
 
 
 
-### Token address is not indexed in TokenRegistry events
-
-https://github.com/0xProject/contracts/issues/135
+### Token address is not indexed in TokenRegistry events [[issues/135]](https://github.com/0xProject/contracts/issues/135)
 
 **Recommendation**
 
@@ -499,9 +491,7 @@ None (in fairness to the 0x team, this was reported after they provided a final 
 
 ## 4.4 Minor
 
-### IPFS hashes more than 32 bytes are unsupported
-
-* https://github.com/0xProject/contracts/issues/75
+### IPFS hashes more than 32 bytes are unsupported [[issues/75]](https://github.com/0xProject/contracts/issues/75)
 
 The `TokenRegistry.sol` contract uses a `bytes32` value to store IPFS hashes.
 https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenRegistry.sol#L94
@@ -536,11 +526,9 @@ require(order.feeRecipient == address(0));
 Per the logic of the `Exchange` contract, this will also ensure that no fees are paid.
 <br/><br/><br/>
 
-### No versioning support in Exchange contract
+### No versioning support in Exchange contract [[issues/113]](https://github.com/0xProject/contracts/issues/113)
 
-* https://github.com/0xProject/contracts/issues/113
-
-It's not clear how an upgraded exchange contract will differentiate from this contract.
+It's not clear how an upgraded `Exchange` contract would be differentiated from this contract.
 
 **Recommendation**
 
@@ -593,9 +581,7 @@ Rename [`Proxy.sol`](https://github.com/0xProject/contracts/blob/888d5a025735722
 Fixed: Proxy was renamed to TokenProxy and then TokenTransferProxy in https://github.com/0xProject/contracts/commit/fe28d31e988fe347f290a805db98c8e48773d8d5
 <br/><br/><br/>
 
-### Non-meaningful boolean returns in multiple functions
-
-* https://github.com/0xProject/contracts/issues/141
+### Non-meaningful boolean returns in multiple functions [[issues/141]](https://github.com/0xProject/contracts/issues/141)
 
 There are several functions that explicitly `return true;` when this information could totally be inferred.
 
