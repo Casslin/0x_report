@@ -168,9 +168,13 @@ We feel this is a satisfactory solution to prevent reentry.
 
 `isRoundingError()` and `getPartialAmount()` have zero tests and no specifications.
 
+**Recommendation**
+
+Thoroughly test both functions, including when the rounding error is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000. Push `isRoundingError` to determine its limits, for example rounding errors at 1e27/1e30, (1e27-1)/1e30, (1e27+1)/1e30 and beyond.
+
 **Resolution**
 
-0x implemented tests for both [isRoundingError and getPartialAmount](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L168).
+0x implemented tests for both [isRoundingError and getPartialAmount](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L168), but did not determine any limits and had less than 10 tests total for both.
 <br/><br/><br/>
 
 ### Redesign of the timelock pattern in custom MultiSig contract [[issues/94]](https://github.com/0xProject/contracts/issues/94)
