@@ -462,7 +462,7 @@ Add an event after [contracts/base/Ownable.sol#L24](https://github.com/0xProject
 
 **Resolution**
 
-None (in fairness to the 0x team, this was reported after they provided a final commit hash).
+None (in fairness to the 0x team, this was reported after they provided the final system).
 
 <br/><br/><br/>
 
@@ -477,7 +477,8 @@ https://github.com/0xProject/contracts/blob/71281859f3466b51dcc2c09e740c106bff19
 
 **Resolution**
 
-None (in fairness to the 0x team, this was reported after they provided a final commit hash).
+Fixed in the final system:
+https://github.com/0xProject/contracts/commit/19c8c08503a82cc72c3a8b08b78ae9f83aa1934b
 
 <br/><br/><br/>
 
