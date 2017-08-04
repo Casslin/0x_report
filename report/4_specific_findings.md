@@ -23,7 +23,7 @@ A trivial case is `target` values >= 1000 will never indicate a rounding error: 
 
 2. Implement the function using the standard definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error).
 
-3. Thoroughly test `isRoundingError`, including when the rounding error is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000. 
+3. Thoroughly test `isRoundingError`, including when the rounding error is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000. Push `isRoundingError` to determine its limits, for example rounding errors at 1e27/1e30, (1e27-1)/1e30, (1e27+1)/1e30 and beyond.
 
 **Resolution**
 
@@ -126,7 +126,7 @@ This effectively translates to the [final implementation](https://github.com/0xP
     }
 ```
 
-0x also [tested](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L136) the `isRoundingError` function and included cases when the rounding is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000.
+0x also [tested](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L136) the `isRoundingError` function but did not test with large values enough to explore its behavior and determine its limits.
 <br/><br/><br/>
 
 ## 4.2 Major
