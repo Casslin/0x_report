@@ -338,7 +338,7 @@ Remove the state variable [`PROXY_CONTRACT`](https://github.com/0xProject/contra
 Fixed in [pull/108](https://github.com/0xProject/contracts/pull/108).
 <br/><br/><br/>
 
-### `TokenDistributionWithRegistry::setTokenAllowance()` is unnecessary [issues/89](https://github.com/0xProject/contracts/issues/89)
+### `TokenDistributionWithRegistry::setTokenAllowance()` is unnecessary [[issues/89]](https://github.com/0xProject/contracts/issues/89)
 
 The [`TokenDistributionWithRegistry::setTokenAllowance()`](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol#L218) function unnecessarily increases the "surface area" of the `TokenDistributionWithRegistry` contract, and can easily be incorporated into `TokenDistributionWithRegistry::init()`.
 
