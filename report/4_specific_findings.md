@@ -463,7 +463,27 @@ Unfortunately, there is still an occurrence: https://github.com/0xProject/contra
 
 
 
-### Token address is not indexed in TokenRegistry events [issues/135](https://github.com/0xProject/contracts/issues/135)
+### No event when TokenTransferProxy `transferOwnership` occurs
+
+https://github.com/0xProject/contracts/issues/147
+
+When `transferOwnership` occurs, an event may be desirable for user interfaces, monitoring services, as well as blockchain explorers.
+
+**Recommendation**
+
+Add an event after https://github.com/0xProject/contracts/blob/f999116be42258b1ba6d272e366df31c6b7fbb91/contracts/base/Ownable.sol#L24
+
+**Resolution**
+
+None (in fairness to the 0x team, this was reported after they provided a final commit hash).
+
+<br/><br/><br/>
+
+
+
+### Token address is not indexed in TokenRegistry events
+
+https://github.com/0xProject/contracts/issues/135
 
 **Recommendation**
 
