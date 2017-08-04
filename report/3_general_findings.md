@@ -86,7 +86,7 @@ In 0x’s [reimplementation](https://github.com/0xProject/contracts/pull/132/com
 
 ### Unfillable Orders
 
-Another point worth mentioning, due to rounding errors, are unfillable orders. Unfillable orders arise when all potential fills result in too high of a rounding error, so the order is essentially bricked. An example of such an order is outlined below.
+Rounding errors cause unfillable orders, which arise when all potential fills result in too high of a rounding error, so the order is essentially bricked. An example of such an order is outlined below:
 
 Alice creates an order of 1001 token A for 3 token B. Bob then fills this order with fillTakerTokenAmount = 2. This order only has a .05% error, so the order goes through without any problems. However, now if any other taker tries to fill the remaining 1 token B `isRoundingError` will always return true as it has a .19% error. Now, this order is in a perpetual limbo and will waste potential takers' gas until Alice cancels the order.
 <br/><br/><br/>
