@@ -46,7 +46,7 @@ Although it is difficult to solve front running problems on a blockchain, 0x has
 
 
 
-### JC 3.2.3 Lack of specifications and documentation
+### 3.2.3 Lack of specifications and documentation
 
 Ref: [Best Practices: specifications and documentation](https://github.com/ConsenSys/smart-contract-best-practices#security-related-documentation-and-procedures)
 
@@ -76,7 +76,7 @@ In 0x’s [reimplementation](https://github.com/0xProject/contracts/pull/132/com
 
 Another point worth mentioning, due to rounding errors, are unfillable orders. Unfillable orders arise when all potential fills result in too high of a rounding error, so the order is essentially bricked. An example of such an order is outlined below.
 
-Alice creates an order of 1001 token A for 3 token B. Bob then fills this order with fillTakerTokenAmount = 2. This order only has a .05% error, so the order goes through without any problems. However, now if any other taker tries to fill the remaining 1 token B `isRoundingError` will always return true as it has a .19% error. Now, this order is in a perpetual limbo and will waste potential takers' gas until Alice cancels the order. 
+Alice creates an order of 1001 token A for 3 token B. Bob then fills this order with fillTakerTokenAmount = 2. This order only has a .05% error, so the order goes through without any problems. However, now if any other taker tries to fill the remaining 1 token B `isRoundingError` will always return true as it has a .19% error. Now, this order is in a perpetual limbo and will waste potential takers' gas until Alice cancels the order.
 <br/><br/><br/>
 
 
@@ -176,8 +176,8 @@ Upgrade all contracts to solidity 0.4.14.
 
 #### Resolution
 
-Recognizing that deployment and testing are heavily dependent on Truffle, we have inquired about the timeline for a new release with the latest version of the solidity compiler. This is expected early next week, and should be utilized for the final deployment of the system. 
+Recognizing that deployment and testing are heavily dependent on Truffle, we have inquired about the timeline for a new release with the latest version of the solidity compiler. This is expected early next week, and should be utilized for the final deployment of the system.
 
 ### Spelling, names, grammar...
 
-Although above we have reported the Major issue of a lack of specifications and documentation, and have reviewed them and code comments, we note that are some spelling mistakes and grammar improvements, and some variable names in code that could be improved, but we do not attempt to record or rectify these.
+Although above we have reported the Major issue of a lack of specifications and documentation, and have reviewed them and code comments, we note that there are some spelling mistakes and flawed grammar, and some variable names in code that could be improved, but we do not attempt to record or rectify these.
