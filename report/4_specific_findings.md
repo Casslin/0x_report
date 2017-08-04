@@ -90,7 +90,7 @@ function isRoundingError(uint numerator, uint denominator, uint target)
         return errPercentageTimes1000 > 1;
     }
 ```
-In 0x’s final implementation of `isRoundingError`they were able to simplify the percent error formula to
+In 0x’s final implementation of `isRoundingError`they were able to [simplify the percent error formula](https://www.wolframalpha.com/input/?i=((a*b%2Fc)+-+floor(a*b%2Fc))+%2F+(a*b%2Fc)+%3D+((a*b)%25c)%2F(a*b)) to
 
 R/(fillTakerTokenAmount * makerTokenAmount) <= .001
 
