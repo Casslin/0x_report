@@ -168,7 +168,7 @@ We feel this is a satisfactory solution to prevent reentry.
 
 **Resolution**
 
-0x implemented tests for both [isRoundingError and getPartialAmount](https://github.com/0xProject/contracts/pull/129/commits/e7c291037d5f1f12be6410dc37c5abbf2de8d9a3).
+0x implemented tests for both [isRoundingError and getPartialAmount](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L168).
 <br/><br/><br/>
 
 ### Redesign of the timelock pattern in custom MultiSig contract [[issues/94]](https://github.com/0xProject/contracts/issues/94)
