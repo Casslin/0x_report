@@ -83,7 +83,7 @@ which incorrectly assumed that if the `order.makerTokenAmount` is greater than 1
 
 1. There's no **documentation** describing limits of `isRoundingError` or its behavior apart from original code comments mentioning 0.1%.
 
-2. In 0x’s [reimplementation](https://github.com/0xProject/contracts/pull/132/commits/c1c4befeac352eaa144cc9c2185e618bea505c82) of `isRoundingError`, they were able to simplify the rounding error calculation, [using some mathematical magic](https://www.wolframalpha.com/input/?i=((a*b%2Fc)+-+floor(a*b%2Fc))+%2F+(a*b%2Fc)+%3D+((a*b)%25c)%2F(a*b)) this leads to a much more elegant and straightforward implementation, while also reducing gas costs for the takers.
+2. 0x used an [exact mathematical equivalent](https://www.wolframalpha.com/input/?i=((a*b%2Fc)+-+floor(a*b%2Fc))+%2F+(a*b%2Fc)+%3D+((a*b)%25c)%2F(a*b)) of approximation error and [implemented `isRoundingError()`](https://github.com/0xProject/contracts/pull/132/commits/c1c4befeac352eaa144cc9c2185e618bea505c82) accordingly.
 
 3. [6 tests](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L136) were added for `isRoundingError()`.  There is no test code with large values to explore its behavior further and determine its limits.
 
