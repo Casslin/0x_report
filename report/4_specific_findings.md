@@ -19,11 +19,11 @@ A trivial case is `target` values >= 1000 will never indicate a rounding error: 
 
 **Recommendation**
 
-1. As there's no other documentation about the system that describes factors such as desired behaviors of the system and the interaction of components and functions like `isRoundingError`, this issue has been classified `Critical` as users of a financial system should have defined and precise behavior. We recommend more documentation on `isRoundingError` including descriptions as they apply to presumably providing users with guarantees and protections, and the limits to those protections and when they will not hold. For example, if certain protections are only provided to users if they trade 1000+ tokens, then those should be clearly documented.
+1. As there's no other **documentation** about the system that describes factors such as desired behaviors of the system and the interaction of components and functions like `isRoundingError`, this issue has been classified `Critical` as users of a financial system should have defined and precise behavior. We recommend more documentation on `isRoundingError` including descriptions as they apply to presumably providing users with guarantees and protections, and the limits to those protections and when they will not hold. For example, if certain protections are only provided to users if they trade 1000+ tokens, then those should be clearly documented.
 
-2. Implement the function using the standard definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error).
+2. **Fix** the implementation using the standard definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error).
 
-3. Thoroughly test `isRoundingError` [[issues/92]](https://github.com/0xProject/contracts/issues/92), including when the rounding error is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000. Push `isRoundingError` to determine its limits, for example rounding errors at 1e27/1e30, (1e27-1)/1e30, (1e27+1)/1e30 and beyond.
+3. **Thoroughly test** `isRoundingError` [[issues/92]](https://github.com/0xProject/contracts/issues/92), including when the rounding error is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000. Push `isRoundingError` to determine its limits, for example rounding errors at 1e27/1e30, (1e27-1)/1e30, (1e27+1)/1e30 and beyond.  While some limits may not be reachable in usual practice, it does not mean that they should remain unknown, and most scenarios are possible in testing.  Furthermore, some numbers which may seem large, may still have practical impact and importance for testing if one considers that ETH itself is divisible to 18 decimals, and there are no limits defined in any token standards about limits to decimals.
 
 **Resolution**
 
