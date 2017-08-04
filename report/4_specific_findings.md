@@ -90,19 +90,41 @@ function isRoundingError(uint numerator, uint denominator, uint target)
         return errPercentageTimes1000 > 1;
     }
 ```
-In 0x’s final implementation of `isRoundingError`they were able to [simplify the percent error formula](https://www.wolframalpha.com/input/?i=((a*b%2Fc)+-+floor(a*b%2Fc))+%2F+(a*b%2Fc)+%3D+((a*b)%25c)%2F(a*b)) to
+They were able to [simplify the percent error formula](https://www.wolframalpha.com/input/?i=((a*b%2Fc)+-+floor(a*b%2Fc))+%2F+(a*b%2Fc)+%3D+((a*b)%25c)%2F(a*b)) to
 
-R/(fillTakerTokenAmount * makerTokenAmount) <= .001
+R/(fillTakerTokenAmount * makerTokenAmount) <= 0.001
 
 where R = (fillTakerTokenAmount * makerTokenAmount)%takerTokenAmount = the remainder of the calculation.
 
-Multiplying each side by 1000 yields
+Division in Solidity can only return an integer, so multiplying each side by 1000 yields:
 
-1000 * R/(fillTakerTokenAmount*makerTokenAmount) <= 1.
+1000 * R/(fillTakerTokenAmount*makerTokenAmount) <= 1
 
-And if the calculation is greater than 1 there's a rounding error greater than .1% and the function returns true.
+Integer division is still unable to detect 3 decimal places (for 0.001) so multiply by 1000 again to get 3 decimal places:
 
-Furthermore, 0x thoroughly [tested](https://github.com/0xProject/contracts/blob/ad79fb669bec3ed431ff4745e978c1535ca82eae/test/ts/exchange/helpers.ts) the `isRoundingError` function and included multiple edge cases.
+1,000,000 * R/(fillTakerTokenAmount*makerTokenAmount) <= 1000
+
+If the calculation is greater than 1000, this means there's a rounding error greater than 0.001 and the function returns true.
+
+This effectively translates to the [final implementation](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/contracts/Exchange.sol):
+```
+    function isRoundingError(uint numerator, uint denominator, uint target)
+        public
+        constant
+        returns (bool)
+    {
+        uint remainder = mulmod(target, numerator, denominator);
+        if (remainder == 0) return false; // No rounding error.
+
+        uint errPercentageTimes1000000 = safeDiv(
+            safeMul(remainder, 1000000),
+            safeMul(numerator, target)
+        );
+        return errPercentageTimes1000000 > 1000;
+    }
+```
+
+0x also [tested](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L136) the `isRoundingError` function and included cases when the rounding is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000.
 <br/><br/><br/>
 
 ## 4.2 Major
