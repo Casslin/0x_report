@@ -195,7 +195,7 @@ This was addressed in [pull/117](https://github.com/0xProject/contracts/pull/117
 
 ## 4.3 Medium
 
-### JC Require callers of Exchange to use token amounts > 0
+### Require callers of Exchange to use token amounts > 0
 
 * https://github.com/0xProject/contracts/issues/101
 
@@ -210,13 +210,14 @@ Do similar for `cancelOrder` https://github.com/0xProject/contracts/blob/888d5a0
 
 **Resolution**
 
-Needs work because these commits are an improvement to a different issue https://github.com/0xProject/contracts/commit/19404fe0eba32d907dee0e69e6f36d0137d6aeb0 and https://github.com/0xProject/contracts/commit/97543b7226fa6bffe2e2bdb931328e4f2397cc6c
+The following commits would appear to fix this issue, but instead was an improvement to a different issue: https://github.com/0xProject/contracts/commit/19404fe0eba32d907dee0e69e6f36d0137d6aeb0 and https://github.com/0xProject/contracts/commit/97543b7226fa6bffe2e2bdb931328e4f2397cc6c
 
-Fixed `fillOrder`
+`fillOrder` was fixed in the updated system:
 https://github.com/0xProject/contracts/commit/97543b7226fa6bffe2e2bdb931328e4f2397cc6c
 
-Still need to fix `cancelOrder`.
-
+`cancelOrder` was fixed in the final system:
+https://github.com/0xProject/contracts/commit/c2ef776078ed0ff81d00b170a068db4f9228d2d8 with a test
+https://github.com/0xProject/contracts/commit/f3778d25455e1f947eb7b25e921677f91acd97f5
 
 <br/><br/><br/>
 

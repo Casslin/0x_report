@@ -2,7 +2,7 @@
 
 ## 3.1 Critical
 
-ConsenSys Diligence found no issues of critical severity during our review.
+ConsenSys Diligence found no general issues of critical severity during our review.
 
 ## 3.2 Major
 
@@ -123,6 +123,27 @@ Lock the pragmas to a specific version in all contracts that will be deployed.
 
 
 
+### `ecrecover()` issue in `solidity <0.4.14`
+
+An issue with the implementation of `ecrecover()` in the Solidity compiler was recently fixed on July 31. As Christian Reitwießner [explained](https://www.reddit.com/r/ethereum/comments/6qph9k/solidity_0414_released_security_bugfix_related_to/):
+
+> Some inputs (invalid v value, for example) are considered invalid by the ecrecover precompiled contract. In these situations, it returns the empty byte array instead of an address. Due to the architecture of the EVM, the caller cannot detect whether the precompiled contract returned the empyt byte array or an actual address (this will change in Metropolis). If the precompiled contract returns the empty byte array, nothing is written to memory and whatever was there before stays there. If you just ignore these situations, then this memory content will be the return value of the Solidity ecrecover function. The compiler tried to zero out this memory area before the call since 0.4.0, but this protective measure turned out to be ineffective.
+
+> If you want to check whether your contracts are affected, then debug a transaction (or better, all possible transactions that might cause ecrecover to be called) and see where the memory contents that are supposed to be overwritten by the ecrecover call originate from. Since the usual use-case for ecrecover is to compare the return value to a specific address, the contract could be vulnerable, if an attacker can cause exactly this address to appear at exactly this location in memory.
+
+#### Recommendation
+
+Exchange.sol uses `ecrecover` to validate orders and during its deployment we recommend it be compiled with 0.4.14: there is no time to thoroughly debug to ascertain if this is actually needed.  For the rest of the system, a qualitative evaluation of the benefits of jumping to a week-old 0.4.14 compiler, do not seem to outweigh the risks of potential compiler bugs introduced in 0.4.12, 0.4.13, and 0.4.14.
+
+We do not recommend any permanent code changes as Truffle currently does not support running parallel versions of the Solidity compiler.
+
+There is no documentation about the deployment process, but it appears that Exchange.sol is [currently deployed](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/migrations/4_configure_proxy.ts#L23) near the end of the process, so it should be possible to ignore the Exchange.sol contract that is deployed with 0.4.11 by Truffle.  An out-of-band compile with 0.4.14 and deploying Exchange.sol, and then calling `tokenTransferProxy.addAuthorizedAddress` with it, should allow the system to function as intended.  The deployment of TokenSale.sol should also reference the 0.4.14 Exchange.sol.  We recommend these steps be documented.
+
+TokenSale.sol also uses `ecrecover`, but it is only active for the duration of the sale and we think the risks are acceptable for it to remain on 0.4.11.  Exchange.sol and TokenSale.sol are the only two contracts that use `ecrecover`.
+<br/><br/><br/>
+
+
+
 ### Keep test contracts separate
 
 It is a common (and good) practice to create contracts external to the contract system for testing purposes. However, these contracts should be kept in a separate directory for clarity.
@@ -174,21 +195,7 @@ In our opinion, accessing state variables, especially writing to them, should be
 None. At this stage close to release, we do not think the code churn from renaming these variables is worthwhile.
 <br/><br/><br/>
 
-### `ecrecover()` issue in `solidity <0.4.14`
 
-An issue with the implementation of `ecrecover()` solidity compiler was recently discovered. As Christian Reitwießner [explained](https://www.reddit.com/r/ethereum/comments/6qph9k/solidity_0414_released_security_bugfix_related_to/):
-
-> Some inputs (invalid v value, for example) are considered invalid by the ecrecover precompiled contract. In these situations, it returns the empty byte array instead of an address. Due to the architecture of the EVM, the caller cannot detect whether the precompiled contract returned the empyt byte array or an actual address (this will change in Metropolis). If the precompiled contract returns the empty byte array, nothing is written to memory and whatever was there before stays there. If you just ignore these situations, then this memory content will be the return value of the Solidity ecrecover function. The compiler tried to zero out this memory area before the call since 0.4.0, but this protective measure turned out to be ineffective.
-
-> If you want to check whether your contracts are affected, then debug a transaction (or better, all possible transactions that might cause ecrecover to be called) and see where the memory contents that are supposed to be overwritten by the ecrecover call originate from. Since the usual use-case for ecrecover is to compare the return value to a specific address, the contract could be vulnerable, if an attacker can cause exactly this address to appear at exactly this location in memory.
-
-#### Recommendation
-
-Upgrade all contracts to solidity 0.4.14.
-
-#### Resolution
-
-Recognizing that deployment and testing are heavily dependent on Truffle, we have inquired about the timeline for a new release with the latest version of the solidity compiler. This is expected early next week, and should be utilized for the final deployment of the system.
 
 ### Spelling, names, grammar...
 
