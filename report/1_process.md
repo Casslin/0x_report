@@ -1,8 +1,12 @@
-# 1. Summary of the Review process and methods
+# 1. Summary of the Review process and scope
 
-**TODO** title of this section and content below should match up more
+<!-- **TODO** title of this section and content below should match up more -->
 
-## 1.1 Scope
+## 1.1 Process
+
+Our review was conducted in two distinct phases, which we review to as initial and final reviews. The initial phase looked at the contract system code as it was provided to us by 0x upon commencement. The final review looked at the system code after our recommendations were incorporated. Thus each issue has a note about the **resolution**, and our assessment of it.
+
+## 1.2 Scope
 
 ### Source code 
 
