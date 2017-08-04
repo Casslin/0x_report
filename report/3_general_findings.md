@@ -31,7 +31,7 @@ The use of `require` checks on all token transfers however is reassuring, as it 
 
 
 
-### Front Running
+### Front Running - DRAFT
 
 Miners have ultimate control over transaction ordering and inclusion of transactions on the Ethereum Blockchain. This means that miners are ultimately able to decide which transactions are filled or canceled. Given this inherent power of miners it opens up a possible form of market manipulation: front running. Front running is the practice of entering into a trade with knowledge of a transaction that will influence the price of the underlying asset or security.
 
@@ -91,7 +91,7 @@ which incorrectly assumed that if the `order.makerTokenAmount` is greater than 1
 
 
 
-### Unfillable Orders
+### Unfillable Orders - DRAFT
 
 Rounding errors cause unfillable orders, which arise when all potential fills result in too high of a rounding error, so the order is essentially bricked. An example of such an order is outlined below:
 
