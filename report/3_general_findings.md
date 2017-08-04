@@ -2,7 +2,7 @@
 
 ## 3.1 Critical
 
-ConsenSys Diligence found no issues of critical severity during our review.
+ConsenSys Diligence found no general issues of critical severity during our review.
 
 ## 3.2 Major
 
