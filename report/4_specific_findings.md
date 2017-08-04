@@ -21,9 +21,9 @@ A trivial case is `target` values >= 1000 will never indicate a rounding error: 
 
 1. As there's no other documentation about the system that describes factors such as desired behaviors of the system and the interaction of components and functions like `isRoundingError`, this issue has been classified `Critical` as users of a financial system should have defined and precise behavior. We recommend more documentation on `isRoundingError` including descriptions as they apply to presumably providing users with guarantees and protections, and the limits to those protections and when they will not hold. For example, if certain protections are only provided to users if they trade 1000+ tokens, then those should be clearly documented.
 
-2. We recommend [unit testing `isRoundingError`](https://github.com/0xProject/contracts/issues/92) and reimplementing the function using the standard definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error) 
+2. We recommend [unit testing `isRoundingError`](https://github.com/0xProject/contracts/issues/92) and reimplementing the function using the standard definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error)
 
-**Resolution** 
+**Resolution**
 
 0x's first reimplementation of isRoundingError is below:
 ```
@@ -48,29 +48,29 @@ function isRoundingError(uint numerator, uint denominator, uint target)
             safeDiv(partialAmountWithoutErr, 1000)                  // Amount being filled, times 1,000
         );
         return errPercentageTimes1000 > 1;
-    }: 
+    }:
 ```
 In 0x’s reimplementation `isRoundingError` first checks if there is a rounding error by using the mulmod opcode. It then calculates the partial amount the taker will receive with the error included (we need this to actually calculate the percent error). This value is then multiplied by 1,000,000 since we’re trying to solve:
 
-  (x - floor(x))/x <= .001 
-  
-  where x = fillTakerTokenAmount * (makerTokenAmount/takerTokenAmount) = the amount of makerToken the taker will receive. 
+  (x - floor(x))/x <= .001
 
-In Solidity, we cannot represent decimals so we multiply this entire expression by 1000 which gives us: 
+  where x = fillTakerTokenAmount * (makerTokenAmount/takerTokenAmount) = the amount of makerToken the taker will receive.
 
-(1000x - 1000floor(x))/x <= 1. 
+In Solidity, we cannot represent decimals so we multiply this entire expression by 1000 which gives us:
 
-However, the x in the denominator could still have a rounding error, thus we multiply the numerator and denominator by 1000 again which gives us 
+(1000x - 1000floor(x))/x <= 1.
 
-(1,000,000x - 1,000,000floor(x))/1000x <= 1. 
+However, the x in the denominator could still have a rounding error, thus we multiply the numerator and denominator by 1000 again which gives us
 
-This elucidates why we multiply by 1,000,000. Now, we estimate the amount the taker should receive without any error. We calculate this by performing this calculation: 
+(1,000,000x - 1,000,000floor(x))/1000x <= 1.
 
-filledTakerTokenAmount * makerTokenAmount * 1,000,000/takerTokenAmount. 
+This elucidates why we multiply by 1,000,000. Now, we estimate the amount the taker should receive without any error. We calculate this by performing this calculation:
 
-(It's worth noting that we multiply by 1,000,000 before dividing to increase the precision of the calculation) 
+filledTakerTokenAmount * makerTokenAmount * 1,000,000/takerTokenAmount.
 
-Now, that we have x and floor(x) the code calculates the error percentage (times 1000) by subtracting the partialAmountWithError from the partialAmountWIthoutError and dividing that by the partialAmountWithoutError*1000. It then checks if this value is > 1 (.1% * 1000). If so, there’s a rounding error and it returns true. 
+(It's worth noting that we multiply by 1,000,000 before dividing to increase the precision of the calculation)
+
+Now, that we have x and floor(x) the code calculates the error percentage (times 1000) by subtracting the partialAmountWithError from the partialAmountWIthoutError and dividing that by the partialAmountWithoutError*1000. It then checks if this value is > 1 (.1% * 1000). If so, there’s a rounding error and it returns true.
 
 Shortly after this implementation 0x was able to simplify the logic significantly:
 ```
@@ -89,11 +89,11 @@ function isRoundingError(uint numerator, uint denominator, uint target)
         return errPercentageTimes1000 > 1;
     }
 ```
-In 0x’s final implementation of `isRoundingError`they were able to simplify the percent error formula to 
+In 0x’s final implementation of `isRoundingError`they were able to simplify the percent error formula to
 
-R/(fillTakerTokenAmount * makerTokenAmount) <= .001 
+R/(fillTakerTokenAmount * makerTokenAmount) <= .001
 
-where R = (fillTakerTokenAmount * makerTokenAmount)%takerTokenAmount = the remainder of the calculation. 
+where R = (fillTakerTokenAmount * makerTokenAmount)%takerTokenAmount = the remainder of the calculation.
 
 Multiplying each side by 1000 yields
 
@@ -287,7 +287,7 @@ Clarify the intended design.
 
 **Resolution**
 
-The `setCapPerAddress()` function was replaced with `getEthCapPerAddress()` in [pull/108](https://github.com/0xProject/contracts/pull/108/commits/f56e3fdeaf741beadb3a6f655b49e71ba718e1c3#diff-9f72358cf6a5cd5763f962f132d50481R228). The new function increases the cap each day that passes. We have reviewed the new code and found no safety issues.
+Fixed: The `setCapPerAddress()` function was replaced with `getEthCapPerAddress()` in [pull/108](https://github.com/0xProject/contracts/pull/108/commits/f56e3fdeaf741beadb3a6f655b49e71ba718e1c3#diff-9f72358cf6a5cd5763f962f132d50481R228). The new function increases the cap each day that passes. We have reviewed the new code and found no safety issues.
 <br/><br/><br/>
 
 ### Enforce invariants with `assert` instead of "safeMath"
@@ -348,9 +348,13 @@ Fixed in https://github.com/0xProject/contracts/commit/27163a6973758f56098430040
 
 The [`TokenDistributionWithRegistry::setTokenAllowance()`](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol#L218) function unnecessarily increases the "surface area" of the `TokenDistributionWithRegistry` contract, and can easily be incorporated into `TokenDistributionWithRegistry::init()`.
 
-**Recommendation** Remove `setTokenAllowance()`, and move its operations in `init()`.
+**Recommendation**
 
-**Resolution** This has been fixed: https://github.com/0xProject/contracts/pull/99
+Remove `setTokenAllowance()`, and move its operations in `init()`.
+
+**Resolution**
+
+This has been fixed: https://github.com/0xProject/contracts/pull/99
 https://github.com/0xProject/contracts/commit/efdba3dfdf29585ddeca39a452c16e197f2c7f46#diff-9f72358cf6a5cd5763f962f132d50481
 <br/><br/><br/>
 
@@ -360,9 +364,13 @@ https://github.com/0xProject/contracts/commit/efdba3dfdf29585ddeca39a452c16e197f
 
 [Explicitly marking visibility](https://github.com/ConsenSys/smart-contract-best-practices#explicitly-mark-visibility-in-functions-and-state-variables) in functions and state variables makes it easier to catch and reason about incorrect assumptions about who can call a function or access a variable. The recent parity multisig exploit highlights the necessity of this.
 
-**Recommendation** Add visibility specifiers for all state variables and functions.
+**Recommendation**
 
-**Resolution** Fixed in https://github.com/0xProject/contracts/commit/ed92920502ca637c7ea6ff071ad85e28ae56aa94
+Add visibility specifiers for all state variables and functions.
+
+**Resolution**
+
+Fixed in https://github.com/0xProject/contracts/commit/ed92920502ca637c7ea6ff071ad85e28ae56aa94
 <br/><br/><br/>
 
 
@@ -427,7 +435,7 @@ Add one or more tests with usage and values similar to how `batchFillOrKillOrder
 
 **Resolution**
 
-A test was added https://github.com/0xProject/contracts/pull/133/commits/a0b60198e29b62b2b242e4e744c446239bb8e8d5#diff-9be78ea0202647bb62f62111374c3ecaR190  The correctness and rigor was not evaluated due to time constraints.
+A test was added https://github.com/0xProject/contracts/pull/133/commits/a0b60198e29b62b2b242e4e744c446239bb8e8d5#diff-9be78ea0202647bb62f62111374c3ecaR190.  The correctness and rigor was not evaluated due to time constraints.
 
 <br/><br/><br/>
 
@@ -455,9 +463,7 @@ Unfortunately, there is still an occurrence: https://github.com/0xProject/contra
 
 
 
-### Token address is not indexed in TokenRegistry events
-
-https://github.com/0xProject/contracts/issues/135
+### Token address is not indexed in TokenRegistry events [issues/135](https://github.com/0xProject/contracts/issues/135)
 
 **Recommendation**
 
@@ -482,9 +488,13 @@ https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13
 
 IPFS uses a [multihash](https://github.com/multiformats/multihash) and the TokenRegistry might also be assuming a convention that the first 2 bytes of the IPFS hash, which are not stored on-chain are 0x1220.
 
-**Recommendations**: Assumptions should be documented. Consider future-proofing by using the `bytes` type rather than `bytes32`.
+**Recommendations**
 
-**Resolution** Fixed by storing IPFS hashes stored as `bytes` here: https://github.com/0xProject/contracts/pull/86
+Assumptions should be documented. Consider future-proofing by using the `bytes` type rather than `bytes32`.
+
+**Resolution**
+
+Fixed by storing IPFS hashes stored as `bytes` here: https://github.com/0xProject/contracts/pull/86
 <br/><br/><br/>
 
 ### TokenDistributionWithRegistry::init does not ensure zero fees [[issues/144]](https://github.com/0xProject/contracts/issues/144)
@@ -497,7 +507,7 @@ Add a `require` statement ensuring no extra fees will be paid on order fills.
 
 **Resolution**
 
-[Pull/108](https://github.com/0xProject/contracts/pull/108#discussion-diff-129530972R145), added
+Fixed: [Pull/108](https://github.com/0xProject/contracts/pull/108#discussion-diff-129530972R145), added
 
 ```
 require(order.feeRecipient == address(0));
@@ -521,26 +531,21 @@ Exchange contract versions could be clarified with a `string public version` val
 Fixed in [pull/117](https://github.com/0xProject/contracts/pull/117/commits/edd4a09f6fa55d045cc3d20d8687ec688263fc00).
 <br/><br/><br/>
 
-### GL/JM TokenDistributionWithRegistry Order Struct
-<!-- George -->
-https://github.com/0xProject/contracts/issues/91
-<!-- Not sure this one should be included? [TODO cf TokenDistributionWithRegistry::init does not ensure zero fees] -->
+### Duplication of contract address storage in `TokenDistributionWithRegistry.sol` [[issue/138]](https://github.com/0xProject/contracts/issues/138)
 
-### JM/JC Duplication of contract address storage in `TokenDistributionWithRegistry.sol`
-
-TODO https://github.com/0xProject/contracts/issues/138 this could change to
-instead of another variable (PROTOCOL_TOKEN_CONTRACT), they should just be able to do `address(protocolToken)`  https://github.com/0xProject/contracts/blob/e51d4dcb4c8e0d93815e9d2a5c511d60ce017870/contracts/TokenSale.sol#L141
-
-* We note that the contract is using [3 storage slots](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol#L35-L37) which could be avoided.
+We note that the contract is using [3 storage slots](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol#L35-L37) which could be avoided.
 
 **Recommendation**
 
-None. This is effectively a one-time cost instead of a recurring cost, so there are no dangers related to increasing costs.
+Remove `address public PROTOCOL_TOKEN_CONTRACT;`, when needed, the address can be retrieved using `address(protocolToken)`.
+
+
+**Resolved**
+
+Fixed: The issue was addressed in [pull/143](https://github.com/0xProject/contracts/pull/143/commits/d522935687b146afecf582447756f967edf2f21f).
 <br/><br/><br/>
 
-### TokenDistributionWithRegistry.sol does not reference Registry.sol
-
-* https://github.com/0xProject/contracts/issues/106
+### `TokenDistributionWithRegistry.sol` does not reference `Registry.sol` [[issues/106]](https://github.com/0xProject/contracts/issues/106)
 
 Despite the name, [TokenDistributionWithRegistry](https://github.com/0xProject/contracts/blob/frozen/contracts/TokenDistributionWithRegistry.sol) contract does not import, or make any reference to the Registry contract at all. This is confusing.
 
@@ -550,13 +555,11 @@ Use a clearer name, or implement the intended `Registry.sol` functionality.
 
 **Resolution**
 
-0x clarified that the "Registry" being referred to here is the mapping holding a list of `registered` contributors. The contract was renamed to `TokenSale.sol`: https://github.com/0xProject/contracts/pull/120.
+Fixed: The developers clarified that the "Registry" being referred to here is the mapping holding a list of `registered` contributors. For clarity the contract was renamed to `TokenSale.sol`: https://github.com/0xProject/contracts/pull/120.
 <br/><br/><br/>
 
 
-### `Proxy.sol` contract is not generic as its name implies
-
-* https://github.com/0xProject/contracts/issues/109
+### `Proxy.sol` contract is not a generic Proxy as its name implies [issues/109](https://github.com/0xProject/contracts/issues/109)
 
 The concept of a Proxy contracts is often associated with a general purpose identity contract, as  in [Uport](https://github.com/uport-project/uport-identity/blob/develop/contracts/Proxy.sol) or as proposed in [ERC 121](https://github.com/ethereum/EIPs/issues/121). `TokenProxy.sol` (or something else) may be a better name because the [proxy function here isn't generic but for token transferFrom](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Proxy.sol#L101)
 
