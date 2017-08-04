@@ -22,7 +22,11 @@ A possible approach would be `require()` that tokens are registered in the `Toke
 
 **Resolution**
 
-**JM TODO: I have followed up with 0x about how they would like to address this.**
+After discussing with the 0x team, and following the logic flow, it appears that the only potential outcome of a reentrant call to `fillOrder()` would be to completely fill the maker order through multiple taker orders.
+
+We note that a Malicious Token was added in [commit/8ae467](https://github.com/0xProject/contracts/commit/8ae467ad24c29f86209d342ec7a7fc3e124258c9) for testing, but the added test does not verify the outcome of this case of reentry.
+
+The use of `require` checks on all token transfers however is reassuring, as it would revert all changes if any transfer within and call to `fillOrder()` fails. 
 <br/><br/><br/>
 
 
