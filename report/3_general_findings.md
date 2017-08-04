@@ -59,7 +59,7 @@ The primary documentation we received was the white paper which did not cover ma
 Another example is the [Token Distribution contract](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol). We have written up some descriptions in the Overview and Appendix to provide readers with more context.
 <br/><br/><br/>
 
-### Rounding of numbers
+### Rounding errors
 
 Given the 0x protocol allows for partial fills, rounding errors are extremely pertinent to the protocol as they can act as a large hidden cost to takers and ultimately result in the loss of tokens. Rounding errors affect "partial fills", ie. when the remainder (`(fillTakerTokenAmount*makerTokenAmount)%takerTokenAmount`) does not equal 0, and increases linearly as the remainder increases. Furthermore, since the EVM does not support floating point numbers rounding errors need to be approximated. However, the precision of this approximation can be increased by multiplying the remainder (i.e - multiplying the remainder by 10 increases the precision by 1 decimal point).
 
@@ -71,11 +71,13 @@ Given the 0x protocol allows for partial fills, rounding errors are extremely pe
 
 which incorrectly assumed that if the `order.makerTokenAmount` is greater than 1000 there will never be a rounding error greater than .1%.
 
-A counterexample to this is a trade where `order.makerTokenAmount` is 1001, `order.takerTokenAmount` is 17, and `fillTakerTokenAmount` is 1; in which case the rounding error is ``(58.8823529 - 58)/58 = 1.5%``, yet `isRoundingError` returns false.
-
 **Recommendation**
 
-We recommend re-implementing `isRoundingError`, using the definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error) and creating thorough unit tests that include boundary conditions such as a .09% error, a .1% error, and a .11% error. For instance, orders where a taker purchases 10000 token A, but only receives 9989 token A, 9990 token A, or 9991 token A. We also believe it would be valuable to garner feedback from the community and future users of the protocol on what an appropriate error threshold is.
+1. As there's no other **documentation** about the system that describes factors such as desired behaviors of the system and the interaction of components and functions like `isRoundingError`, this issue has been classified `Critical` as users of a financial system should have defined and precise behavior. We recommend more documentation on `isRoundingError` including descriptions as they apply to presumably providing users with guarantees and protections, and the limits to those protections and when they will not hold. For example, if certain protections are only provided to users if they trade 1000+ tokens, then those should be clearly documented.
+
+2. **Fix** the implementation using the standard definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error).
+
+3. **Thoroughly test** `isRoundingError` [[issues/92]](https://github.com/0xProject/contracts/issues/92), including when the rounding error is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000. Push `isRoundingError` to determine its limits, for example rounding errors at 1e27/1e30, (1e27-1)/1e30, (1e27+1)/1e30 and beyond.  While some limits may not be reachable in usual practice, it does not mean that they should remain unknown, and most scenarios are possible in testing.  Furthermore, some numbers which may seem large, may still have practical impact and importance for testing if one considers that ETH itself is divisible to 18 decimals, and there are no limits defined in any token standards about limits to decimals.
 
 **Resolution**
 
