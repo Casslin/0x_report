@@ -22,7 +22,7 @@ A possible approach would be `require()` that tokens are registered in the `Toke
 
 After discussing with the 0x team, and re-examining the logic, it appears that the only potential outcome of a reentrant call to `fillOrder()` would be to completely fill a maker order, or multiple maker orders by reentering with multiple taker orders.
 
-Also reassuring, is that no changes are made to internal state variables modifications after these external calls.
+A reentrancy issue would be mitigated as there are no changes being made to internal state variables modifications after these external calls.
 
 We note that a Malicious Token was added in [commit/8ae467](https://github.com/0xProject/contracts/commit/8ae467ad24c29f86209d342ec7a7fc3e124258c9) for testing, but the added test does not verify the outcome of this case of reentry.
 
@@ -31,7 +31,7 @@ The use of `require` checks on all token transfers however is reassuring, as it 
 
 
 
-### Front Running
+### Front Running - DRAFT
 
 Miners have ultimate control over transaction ordering and inclusion of transactions on the Ethereum Blockchain. This means that miners are ultimately able to decide which transactions are filled or canceled. Given this inherent power of miners it opens up a possible form of market manipulation: front running. Front running is the practice of entering into a trade with knowledge of a transaction that will influence the price of the underlying asset or security.
 
@@ -56,10 +56,10 @@ Our review found a lack of specifications and documentation, without which we ar
 
 The primary documentation we received was the white paper which did not cover many of the interactions and components of the system. For example, the [critical issue of rounding](../report/4_specific_findings.md#41-critical) lacks a specification and originally had [no tests](https://github.com/0xProject/contracts/issues/92).
 
-Another example is the [Token Distribution contract](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol). Furthermore, it may be preferable for the system to be more codified and deterministic than being dependent on centralized actions such as where the timing is essentially arbitrary.
+Another example is the [Token Distribution contract](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol). We have written up some descriptions in the Overview and Appendix to provide readers with more context.
 <br/><br/><br/>
 
-### Rounding of numbers
+### Rounding errors
 
 Given the 0x protocol allows for partial fills, rounding errors are extremely pertinent to the protocol as they can act as a large hidden cost to takers and ultimately result in the loss of tokens. Rounding errors affect "partial fills", ie. when the remainder (`(fillTakerTokenAmount*makerTokenAmount)%takerTokenAmount`) does not equal 0, and increases linearly as the remainder increases. Furthermore, since the EVM does not support floating point numbers rounding errors need to be approximated. However, the precision of this approximation can be increased by multiplying the remainder (i.e - multiplying the remainder by 10 increases the precision by 1 decimal point).
 
@@ -71,22 +71,29 @@ Given the 0x protocol allows for partial fills, rounding errors are extremely pe
 
 which incorrectly assumed that if the `order.makerTokenAmount` is greater than 1000 there will never be a rounding error greater than .1%.
 
-A counterexample to this is a trade where `order.makerTokenAmount` is 1001, `order.takerTokenAmount` is 17, and `fillTakerTokenAmount` is 1; in which case the rounding error is ``(58.8823529 - 58)/58 = 1.5%``, yet `isRoundingError` returns false.
-
 **Recommendation**
 
-We recommend re-implementing `isRoundingError`, using the definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error) and creating thorough unit tests that include boundary conditions such as a .09% error, a .1% error, and a .11% error. For instance, orders where a taker purchases 10000 token A, but only receives 9989 token A, 9990 token A, or 9991 token A. We also believe it would be valuable to garner feedback from the community and future users of the protocol on what an appropriate error threshold is.
+1. As there's no other **documentation** about the system that describes factors such as desired behaviors of the system and the interaction of components and functions like `isRoundingError`, this issue has been classified `Critical` as users of a financial system should have defined and precise behavior. We recommend more documentation on `isRoundingError` including descriptions as they apply to presumably providing users with guarantees and protections, and the limits to those protections and when they will not hold. For example, if certain protections are only provided to users if they trade 1000+ tokens, then those should be clearly documented.
+
+2. **Fix** the implementation using the standard definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error).
+
+3. **Thoroughly test** `isRoundingError` [[issues/92]](https://github.com/0xProject/contracts/issues/92), including when the rounding error is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000. Push `isRoundingError` to determine its limits, for example rounding errors at 1e27/1e30, (1e27-1)/1e30, (1e27+1)/1e30 and beyond.  While some limits may not be reachable in usual practice, it does not mean that they should remain unknown, and most scenarios are possible in testing.  Furthermore, some numbers which may seem large, may still have practical impact and importance for testing if one considers that ETH itself is divisible to 18 decimals, and there are no limits defined in any token standards about limits to decimals.
 
 **Resolution**
 
-In 0x’s [reimplementation](https://github.com/0xProject/contracts/pull/132/commits/c1c4befeac352eaa144cc9c2185e618bea505c82) of `isRoundingError`, they were able to simplify the rounding error calculation, [using some mathematical magic](https://www.wolframalpha.com/input/?i=((a*b%2Fc)+-+floor(a*b%2Fc))+%2F+(a*b%2Fc)+%3D+((a*b)%25c)%2F(a*b)) this leads to a much more elegant and straightforward implementation, while also reducing gas costs for the takers. Additionally, the 0x team added [unit tests](https://github.com/0xProject/contracts/pull/129/files#diff-e1e51de7476e0cab7ae50ddcbd4c0ff1R105) to the `isRoundingError` function and have included boundary tests.
+1. There's no **documentation** describing limits of `isRoundingError` or its behavior apart from original code comments mentioning 0.1%.
+
+2. 0x used an [exact mathematical equivalent](https://www.wolframalpha.com/input/?i=((a*b%2Fc)+-+floor(a*b%2Fc))+%2F+(a*b%2Fc)+%3D+((a*b)%25c)%2F(a*b)) of approximation error and [implemented `isRoundingError()`](https://github.com/0xProject/contracts/pull/132/commits/c1c4befeac352eaa144cc9c2185e618bea505c82) accordingly.
+
+3. [6 tests](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L136) were added for `isRoundingError()`.  There is no test code with large values to explore its behavior further and determine its limits.
+
 <br/><br/><br/>
 
 
 
-### Unfillable Orders
+### Unfillable Orders - DRAFT
 
-Another point worth mentioning, due to rounding errors, are unfillable orders. Unfillable orders arise when all potential fills result in too high of a rounding error, so the order is essentially bricked. An example of such an order is outlined below.
+Rounding errors cause unfillable orders, which arise when all potential fills result in too high of a rounding error, so the order is essentially bricked. An example of such an order is outlined below:
 
 Alice creates an order of 1001 token A for 3 token B. Bob then fills this order with fillTakerTokenAmount = 2. This order only has a .05% error, so the order goes through without any problems. However, now if any other taker tries to fill the remaining 1 token B `isRoundingError` will always return true as it has a .19% error. Now, this order is in a perpetual limbo and will waste potential takers' gas until Alice cancels the order.
 <br/><br/><br/>

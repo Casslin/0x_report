@@ -19,13 +19,17 @@ A trivial case is `target` values >= 1000 will never indicate a rounding error: 
 
 **Recommendation**
 
-1. As there's no other documentation about the system that describes factors such as desired behaviors of the system and the interaction of components and functions like `isRoundingError`, this issue has been classified `Critical` as users of a financial system should have defined and precise behavior. We recommend more documentation on `isRoundingError` including descriptions as they apply to presumably providing users with guarantees and protections, and the limits to those protections and when they will not hold. For example, if certain protections are only provided to users if they trade 1000+ tokens, then those should be clearly documented.
+1. As there's no other **documentation** about the system that describes factors such as desired behaviors of the system and the interaction of components and functions like `isRoundingError`, this issue has been classified `Critical` as users of a financial system should have defined and precise behavior. We recommend more documentation on `isRoundingError` including descriptions as they apply to presumably providing users with guarantees and protections, and the limits to those protections and when they will not hold. For example, if certain protections are only provided to users if they trade 1000+ tokens, then those should be clearly documented.
 
-2. We recommend [unit testing `isRoundingError`](https://github.com/0xProject/contracts/issues/92) and reimplementing the function using the standard definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error)
+2. **Fix** the implementation using the standard definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error).
+
+3. **Thoroughly test** `isRoundingError` [[issues/92]](https://github.com/0xProject/contracts/issues/92), including when the rounding error is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000. Push `isRoundingError` to determine its limits, for example rounding errors at 1e27/1e30, (1e27-1)/1e30, (1e27+1)/1e30 and beyond.  While some limits may not be reachable in usual practice, it does not mean that they should remain unknown, and most scenarios are possible in testing.  Furthermore, some numbers which may seem large, may still have practical impact and importance for testing if one considers that ETH itself is divisible to 18 decimals, and there are no limits defined in any token standards about limits to decimals.
 
 **Resolution**
 
-0x's first reimplementation of isRoundingError is below:
+1. There's no **documentation** describing limits of `isRoundingError` or its behavior apart from code comments mentioning 0.1%.
+
+2. 0x's first reimplementation of isRoundingError is below:
 
 ```
 function isRoundingError(uint numerator, uint denominator, uint target)
@@ -90,19 +94,41 @@ function isRoundingError(uint numerator, uint denominator, uint target)
         return errPercentageTimes1000 > 1;
     }
 ```
-In 0x’s final implementation of `isRoundingError`they were able to simplify the percent error formula to
+They were able to [simplify the percent error formula](https://www.wolframalpha.com/input/?i=((a*b%2Fc)+-+floor(a*b%2Fc))+%2F+(a*b%2Fc)+%3D+((a*b)%25c)%2F(a*b)) to
 
-R/(fillTakerTokenAmount * makerTokenAmount) <= .001
+R/(fillTakerTokenAmount * makerTokenAmount) <= 0.001
 
 where R = (fillTakerTokenAmount * makerTokenAmount)%takerTokenAmount = the remainder of the calculation.
 
-Multiplying each side by 1000 yields
+Division in Solidity can only return an integer, so multiplying each side by 1000 yields:
 
-1000 * R/(fillTakerTokenAmount*makerTokenAmount) <= 1.
+1000 * R/(fillTakerTokenAmount*makerTokenAmount) <= 1
 
-And if the calculation is greater than 1 there's a rounding error greater than .1% and the function returns true.
+Integer division is still unable to detect 3 decimal places (for 0.001) so multiply by 1000 again to get 3 decimal places:
 
-Furthermore, 0x thoroughly [tested](https://github.com/0xProject/contracts/blob/ad79fb669bec3ed431ff4745e978c1535ca82eae/test/ts/exchange/helpers.ts) the `isRoundingError` function and included multiple edge cases.
+1,000,000 * R/(fillTakerTokenAmount*makerTokenAmount) <= 1000
+
+If the calculation is greater than 1000, this means there's a rounding error greater than 0.001 and the function returns true.
+
+This effectively translates to the [final implementation](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/contracts/Exchange.sol):
+```
+    function isRoundingError(uint numerator, uint denominator, uint target)
+        public
+        constant
+        returns (bool)
+    {
+        uint remainder = mulmod(target, numerator, denominator);
+        if (remainder == 0) return false; // No rounding error.
+
+        uint errPercentageTimes1000000 = safeDiv(
+            safeMul(remainder, 1000000),
+            safeMul(numerator, target)
+        );
+        return errPercentageTimes1000000 > 1000;
+    }
+```
+
+3. [6 tests](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L136) were added for `isRoundingError()`.  There is no test code with large values to explore its behavior further and determine its limits.
 <br/><br/><br/>
 
 ## 4.2 Major
@@ -144,9 +170,13 @@ We feel this is a satisfactory solution to prevent reentry.
 
 `isRoundingError()` and `getPartialAmount()` have zero tests and no specifications.
 
+**Recommendation**
+
+Thoroughly test both functions, including when the rounding error is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000. Push `isRoundingError` to determine its limits, for example rounding errors at 1e27/1e30, (1e27-1)/1e30, (1e27+1)/1e30 and beyond.
+
 **Resolution**
 
-0x implemented tests for both [isRoundingError and getPartialAmount](https://github.com/0xProject/contracts/pull/129/commits/e7c291037d5f1f12be6410dc37c5abbf2de8d9a3).
+9 total tests were added for both [`isRoundingError()` and `getPartialAmount()`](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L168).  There were no tests to determine any limits to the functions and when their behaviors are no longer reliable.
 <br/><br/><br/>
 
 ### Redesign of the timelock pattern in custom MultiSig contract [[issues/94]](https://github.com/0xProject/contracts/issues/94)
@@ -195,9 +225,7 @@ This was addressed in [pull/117](https://github.com/0xProject/contracts/pull/117
 
 ## 4.3 Medium
 
-### Require callers of Exchange to use token amounts > 0
-
-* https://github.com/0xProject/contracts/issues/101
+### Require callers of Exchange to use token amounts > 0 [[issues/101]](https://github.com/0xProject/contracts/issues/101)
 
 Callers of functions on `Exchange.sol` can fill and cancel orders for 0 tokens. This would lead to spurious [`ERROR_ORDER_FULLY_FILLED_OR_CANCELLED` logs](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Exchange.sol#L142).
 
@@ -221,10 +249,9 @@ https://github.com/0xProject/contracts/commit/f3778d25455e1f947eb7b25e921677f91a
 
 <br/><br/><br/>
 
-### Incorrectly named constructor in `ZRXToken` contract [[issues/88]]
-(https://github.com/0xProject/contracts/issues/88)
-The constructor name was not u
-pdated during a previous change when the ZRXToken was renamed.
+### Incorrectly named constructor in `ZRXToken` contract [[issues/88]](https://github.com/0xProject/contracts/issues/88)
+
+The constructor name was not updated during a previous change when the ZRXToken was renamed.
 
 **Recommendation**
 
@@ -259,7 +286,7 @@ and compile it the version listed (v0.4.11+commit.68ef5810)  with optimizer enab
 
 
 
-### Token metadata can be silently overwritten in _TokenRegistry_ [issues/115](https://github.com/0xProject/contracts/issues/115)
+### Token metadata can be silently overwritten in _TokenRegistry_ [[issues/115]](https://github.com/0xProject/contracts/issues/115)
 
 In the _TokenRegistry_ contract neither the `addToken()`, `setTokenName()` or the `setTokenSymbol()` check for overwrites in both the `tokenByName` or `tokenBySymbol` mappings.
 
@@ -280,15 +307,15 @@ The modifiers `nameDoesNotExist` and `symbolDoesNotExist` were added. These impl
 
 ### `setCapPerAddress()` can be changed by the owner at any time [[issues/84]](https://github.com/0xProject/contracts/issues/84)
 
-As there was no specification at the time of our initial review, it was not clear whether this is intended behavior. In past token sales, typically there are restrictions in code on when terms of the sale can be modified: for example, an obvious one would be to not allow the capPerAddress to be changed by anyone once the sale has started.
+As there was no specification at the time of our review, it was not clear whether this is intended behavior. In past token sales, typically there are restrictions in code on when terms of the sale can be modified: for example, an obvious one would be to not allow the capPerAddress to be changed by anyone once the sale has started.
 
 **Recommendation**
 
-Clarify the intended design.
+Remove (or minimize) arbitrary actions and enforce them in code.  Prefer code and algorithms over user and centralized actions.  It is preferable for the system to be more codified and deterministic than being dependent on centralized actions where the timing is essentially arbitrary.  The timing can be arbitrary because there is no code that guarantees that the cap will increase; furthermore, at times of heavy network congestion there are no guarantees that the transaction increasing the cap will be mined by a desired time.
 
 **Resolution**
 
-Fixed: The `setCapPerAddress()` function was replaced with `getEthCapPerAddress()` in [pull/108](https://github.com/0xProject/contracts/pull/108/commits/f56e3fdeaf741beadb3a6f655b49e71ba718e1c3#diff-9f72358cf6a5cd5763f962f132d50481R228). The new function increases the cap each day that passes. We have reviewed the new code and found no safety issues.
+Fixed. The `setCapPerAddress()` function was replaced with `getEthCapPerAddress()` in [pull/108](https://github.com/0xProject/contracts/pull/108/commits/f56e3fdeaf741beadb3a6f655b49e71ba718e1c3#diff-9f72358cf6a5cd5763f962f132d50481R228). The new function algorithmically increases the cap each day that passes. We have reviewed the new code and found no safety issues.
 <br/><br/><br/>
 
 ### Enforce invariants with `assert` instead of `safeMath` when appropriate
@@ -341,7 +368,7 @@ Remove the state variable [`PROXY_CONTRACT`](https://github.com/0xProject/contra
 Fixed in [pull/108](https://github.com/0xProject/contracts/pull/108).
 <br/><br/><br/>
 
-### `TokenDistributionWithRegistry::setTokenAllowance()` is unnecessary [issues/89](https://github.com/0xProject/contracts/issues/89)
+### `TokenDistributionWithRegistry::setTokenAllowance()` is unnecessary [[issues/89]](https://github.com/0xProject/contracts/issues/89)
 
 The [`TokenDistributionWithRegistry::setTokenAllowance()`](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol#L218) function unnecessarily increases the "surface area" of the `TokenDistributionWithRegistry` contract, and can easily be incorporated into `TokenDistributionWithRegistry::init()`.
 
@@ -462,7 +489,7 @@ Add an event after [contracts/base/Ownable.sol#L24](https://github.com/0xProject
 
 **Resolution**
 
-None (in fairness to the 0x team, this was reported after they provided a final commit hash).
+None (in fairness to the 0x team, this was reported after they provided the final system).
 
 <br/><br/><br/>
 
@@ -477,7 +504,8 @@ https://github.com/0xProject/contracts/blob/71281859f3466b51dcc2c09e740c106bff19
 
 **Resolution**
 
-None (in fairness to the 0x team, this was reported after they provided a final commit hash).
+Fixed in the final system:
+https://github.com/0xProject/contracts/commit/19c8c08503a82cc72c3a8b08b78ae9f83aa1934b
 
 <br/><br/><br/>
 
