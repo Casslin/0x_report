@@ -256,7 +256,7 @@ and compile it the version listed (v0.4.11+commit.68ef5810)  with optimizer enab
 
 
 
-### Token metadata can be silently overwritten in _TokenRegistry_ [issues/115](https://github.com/0xProject/contracts/issues/115)
+### Token metadata can be silently overwritten in _TokenRegistry_ [[issues/115]](https://github.com/0xProject/contracts/issues/115)
 
 In the _TokenRegistry_ contract neither the `addToken()`, `setTokenName()` or the `setTokenSymbol()` check for overwrites in both the `tokenByName` or `tokenBySymbol` mappings.
 
