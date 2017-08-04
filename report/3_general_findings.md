@@ -1,28 +1,28 @@
 # 3 - General Findings
 
-<!-- This section discusses general issues that apply to the contract (and test) code base. These issues are primarily related to architecture, security assumptions and other high level design decisions, and are essential to a thorough security review. Realizing that these decisions are made as part of a set of trade offs, the 0xProject team may decide not to take action on all of our findings. They should however clarify the rationale for such decisions. -->
-
 ## 3.1 Critical
 
-No general issues of critical severity were found.
+ConsenSys Diligence found no issues of critical severity during our review.
 
 ## 3.2 Major
 
 ### Reentrancy risk from malicious tokens
 
-Any call to an external/untrusted contract has risks which can be difficult to quantify given the dynamic and evolving nature of smart contracts. Although we have not found evidence of an exploit, one which we'd like to discuss is the `Proxy` contract calling the `transferFrom()` function on an untrusted contract, intended to be a token. ([/blob/888d5a/contracts/Proxy.sol#L101](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Proxy.sol#L101)).  A malicious token contract could implement its `transferFrom()` to reenter the `Exchange` contract, for example to `fillOrder()` or `cancelOrder()`.
+Any call to an external/untrusted contract has risks which can be difficult to quantify given the dynamic and evolving nature of smart contracts. Although we have not found evidence of an exploit, one which we'd like to discuss is the `Proxy` contract calling the `transferFrom()` function on an untrusted contract, intended to be a token ([/blob/888d5a/contracts/Proxy.sol#L101](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Proxy.sol#L101)).
+
+A malicious token contract could implement its `transferFrom()` to reenter the `Exchange` contract, for example to `fillOrder()` or `cancelOrder()`.
 
 Reference: [Best Practices; Reentrancy](https://github.com/ConsenSys/smart-contract-best-practices#reentrancy)
 
 **Recommendation**
 
-A possible approach would be `require()` that tokens are registered in the `TokenRegistry`.
-
-  In TokenRegistry.sol, provide a lookup by address function (possibly by adding a `mapping(address=>bool)`): the function could be called `exists` and the idea is that `Exchange.sol` would then have `require(registry.exists(makerToken))`. Implement this recommendation in small steps and commits where each commit includes thorough tests. It is likely that each commit will have more test code: for example when adding an `exists` function to the registry, there would probably be tests for: 1) non-existence, 2) existence, 3) non-existence where a prior existing token was removed 4) updating an existing token...
+A possible approach would be `require()` that tokens are registered in the `TokenRegistry` to be trade-able.
 
 **Resolution**
 
-After discussing with the 0x team, and following the logic flow, it appears that the only potential outcome of a reentrant call to `fillOrder()` would be to completely fill the maker order through multiple taker orders.
+After discussing with the 0x team, and re-examining the logic, it appears that the only potential outcome of a reentrant call to `fillOrder()` would be to completely fill a maker order, or multiple maker orders by reentering with multiple taker orders.
+
+Also reassuring, is that no changes are made to internal state variables modifications after these external calls.
 
 We note that a Malicious Token was added in [commit/8ae467](https://github.com/0xProject/contracts/commit/8ae467ad24c29f86209d342ec7a7fc3e124258c9) for testing, but the added test does not verify the outcome of this case of reentry.
 
@@ -33,7 +33,7 @@ The use of `require` checks on all token transfers however is reassuring, as it 
 
 ### Front Running
 
-Miners have ultimate control over transaction ordering and inclusion of transactions on the Ethereum Blockchain. This means that miners are ultimately able to decide which transactions are filled or canceled. Given this inherent power of miners it opens up a possible form of market manipulation: Front running. Front running is the practice of entering into a trade with knowledge of a transaction that will influence the price of the underlying asset or security.
+Miners have ultimate control over transaction ordering and inclusion of transactions on the Ethereum Blockchain. This means that miners are ultimately able to decide which transactions are filled or canceled. Given this inherent power of miners it opens up a possible form of market manipulation: front running. Front running is the practice of entering into a trade with knowledge of a transaction that will influence the price of the underlying asset or security.
 
 Although 0x uses an off-chain orderbook it is still susceptible to front running as orders are cleared on the blockchain. For example, in Exchange.sol the function fill is susceptible to front running as a miner can always include their transaction first which results in the taker's fill being rejected or only partially filled. Similarly, when a miner sees a maker call cancel they can just fill the order first. Hence, if a maker accidentally places an unfavorable trade they may not be able to cancel it. The functions fillOrdersUpTo and batchFillOrders help mitigate front running by providing backup orders to fill so the taker is not just left with an error log, but nothing prevents a miner from iterating through the orders and filling them all or profiting from slippage.  For instance, a miner might see a taker call fillOrdersUpTo with a large order and then call fill on the lowest priced order and then profit on the additional slippage from the taker's order.
 
@@ -41,7 +41,10 @@ Additionally, given the nature of blockchains, miners are not the only ones able
 
 **Resolution**
 
-Although it is difficult to solve front running problems on a blockchain, 0x has spent a lot of time pondering this problem, and have come up with some impressive solutions to combat front running. Some methods they came up with include a matching model where a relayer only accepts orders that specify the relayer as the taker (this prevents front running as only the relayer can fill the order), a deposit contract model where relayers can create a custom deposit contract that only accepts orders that specify the deposit contract as a taker and then this contract can implement functionality on top of `fillOrder`, and an orderTypes parameter to the message format that will allow for orders with varying functionality that can potentially prevent or disincentivize front running.
+Front running on the blockchain is a difficult problem. Based on our discussions with 0x, it is clear that they have put considerable thought into mechanisms for mitigating and reducing the impact of front running.
+
+We cannot attest to how
+
 <br/><br/><br/>
 
 
@@ -50,12 +53,13 @@ Although it is difficult to solve front running problems on a blockchain, 0x has
 
 Ref: [Best Practices: specifications and documentation](https://github.com/ConsenSys/smart-contract-best-practices#security-related-documentation-and-procedures)
 
-There is a lack of documentation, with many interactions and components of the system not covered at all in the white paper.  The [critical issue of rounding](../report/4_specific_findings.md#41-critical) lacks a specification and originally had [no tests](https://github.com/0xProject/contracts/issues/92).  Without a specification, it is ambiguous what is correct and desired behavior.
+
+Our review found a lack of specifications and documentation, without which we are forced to make inferences about what is correct and desired behavior.
+
+The primary documentation we received was the white paper which did not cover many of the interactions and components of the system. For example, the [critical issue of rounding](../report/4_specific_findings.md#41-critical) lacks a specification and originally had [no tests](https://github.com/0xProject/contracts/issues/92).
 
 Another example is the [Token Distribution contract](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol). Furthermore, it may be preferable for the system to be more codified and deterministic than being dependent on centralized actions such as where the timing is essentially arbitrary.
 <br/><br/><br/>
-
-
 
 ### Rounding of numbers
 
@@ -95,7 +99,7 @@ Alice creates an order of 1001 token A for 3 token B. Bob then fills this order 
 
 ### Makers "griefing attack" on takers
 
-"Griefing" attack of creating many orders is possible, allowing a maker to burn people's gas.  For example: a taker is "griefed" by a maker who's order is no longer valid since the maker tokens no longer exist. This is hard to defend against, as it requires constantly monitoring the maker's token allowance given to the Exchange, (and possibly also balance).
+"Griefing" attack of creating many orders is possible, allowing a maker to burn people's gas.  For example: a taker is "griefed" by a maker whose order is no longer valid since the maker tokens no longer exist. This is hard to defend against, as it requires constantly monitoring the maker's token allowance given to the Exchange, (and possibly also balance).
 
 **Recommendation**
 
@@ -121,7 +125,7 @@ Lock the pragmas to a specific version in all contracts that will be deployed.
 
 ### Keep test contracts separate
 
-It is a common, (and good) practice to create contracts external to the contract system for testing purposes. However, these contracts should be kept in a separate directory for clarity.
+It is a common (and good) practice to create contracts external to the contract system for testing purposes. However, these contracts should be kept in a separate directory for clarity.
 
 **Recommendation**
 
@@ -146,17 +150,17 @@ None. This is a design decision with no impact on security.
 
 ### Use `enum` for error codes [[issues/105]](https://github.com/0xProject/contracts/issues/105)
 
-On https://github.com/0xProject/contracts/blob/master/contracts/Exchange.sol#L29 and onwards you declare error Codes as 8-bit constants to address those codes by their textual definitions throughout the contract's code, however, it is advisable you do that with an `enum` type as per Solidity specs.
+From [contracts/Exchange.sol#L29](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Exchange.sol#L29) onwards, error codes are declared as 8-bit constants. However, it is advisable you do that with an `enum` type as per Solidity specs.
 
 **Recommendation**
 
 Substituting the declaration of error codes as storage variables for an `enum` type.
 
-The purpose of this latter type is exactly to address an enumerable feature through a textual definition throughout the code (with the purpose to not lose readibility) which is exactly the case here.
+The purpose of this latter type is exactly to address an enumerable feature through a textual definition throughout the code (with the purpose to not lose readability) which is exactly the case here.
 
-**Resolution** [[pull/111]](https://github.com/0xProject/contracts/pull/111)
+**Resolution**
 
-The 8-bit constants were indeed substituted for an `enum` type refering all the textual error definitions, as suggested in the original issue's corpus.
+Fixed by implementing our recommendation in [[pull/111]](https://github.com/0xProject/contracts/pull/111).
 <br/><br/><br/>
 
 ### Usage of capitalized names for variables

@@ -2,7 +2,7 @@
 
 For readers not familiar with the inner working of the 0xProject's contract system, we provide a brief summary which we hope will provide greater context for understanding this report.
 
-The contract system examined in this audit forms the core of the 0x Protocol, for on-chain trading of ERC-20 compatible tokens. The system is deployed as 5 contracts, outlined below.
+The contract system examined in this review forms the core of the 0x Protocol, for on-chain trading of ERC-20 compatible tokens. The system is deployed as 5 contracts, outlined below.
 
 <!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
@@ -39,7 +39,7 @@ The `Proxy` has an `authorities` array which lists `Exchange` contract addresses
 
 This `authorities` array can be updated by the `Proxy`'s `owner` address, making it the upgrade mechanism for deploying new versions of the `Exchange` contract, and deprecating old ones.
 
-Thus the `Proxy` is the least changeable component in the system, and is necessarily simple in nature. _After our initial audit, this contract was renamed to `TokenTransferProxy` for clarity._
+Thus the `Proxy` is the least changeable component in the system, and is necessarily simple in nature. _After our initial review, this contract was renamed to `TokenTransferProxy` for clarity._
 
 ## `TokenRegistry`
 
@@ -71,7 +71,7 @@ The mechanism of the sale looks like this:
 * There is also a `capPerAddress` value which increases with time during the sale. Initially, the maximum contribution amount will be set low enough so that all registered addresses can contribute, and over time this will increase until the full value of the `ZRX` token offering has been distributed. The same address can contribute multiple times up, so long as it does not exceed the current `capPerAddress` value.
 
 
-_After our intial audit, this contract was renamed to `TokenSale` for clarity._
+_After our intial review, this contract was renamed to `TokenSale` for clarity._
 
 ## `MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress`
 

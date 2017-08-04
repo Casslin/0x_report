@@ -26,6 +26,7 @@ A trivial case is `target` values >= 1000 will never indicate a rounding error: 
 **Resolution**
 
 0x's first reimplementation of isRoundingError is below:
+
 ```
 function isRoundingError(uint numerator, uint denominator, uint target)
         public
@@ -136,10 +137,9 @@ This solution would, however, entail the addition of an `address` parameter in t
 The 0x team decided not to go with the recommended solution and instead resolved the issue by reducing the gas forwarded in both of the affected functions: `token.balanceOf` and `token.allowance` to a constant value of `4999 gas` in order to prevent state changes when calling malicious tokens (for any state change requires, at least, `5000 gas`).
 <br/><br/><br/>
 
-### JC Correctness of `isRoundingError()` and `getPartialAmount()` which have zero tests [[issues/92]](https://github.com/0xProject/contracts/issues/92)
+### Correctness of `isRoundingError()` and `getPartialAmount()` which have zero tests [[issues/92]](https://github.com/0xProject/contracts/issues/92)
 
-
-TODO `isRoundingError()` and `getPartialAmount()` have zero tests and no specifications.
+`isRoundingError()` and `getPartialAmount()` have zero tests and no specifications.
 
 **Resolution**
 
@@ -147,7 +147,6 @@ TODO `isRoundingError()` and `getPartialAmount()` have zero tests and no specifi
 <br/><br/><br/>
 
 ### Redesign of the timelock pattern in custom MultiSig contract [[issues/94]](https://github.com/0xProject/contracts/issues/94)
-
 
 The
 `MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress` contract has inefficient coding patterns in place.
