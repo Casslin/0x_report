@@ -27,7 +27,9 @@ A trivial case is `target` values >= 1000 will never indicate a rounding error: 
 
 **Resolution**
 
-0x's first reimplementation of isRoundingError is below:
+1. There's no **documentation** describing limits of `isRoundingError` or its behavior apart from code comments mentioning 0.1%.
+
+2. 0x's first reimplementation of isRoundingError is below:
 
 ```
 function isRoundingError(uint numerator, uint denominator, uint target)
@@ -126,7 +128,7 @@ This effectively translates to the [final implementation](https://github.com/0xP
     }
 ```
 
-0x also [tested](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L136) the `isRoundingError` function but did not test with large values enough to explore its behavior and determine its limits.
+3. [6 tests](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L136) were added for `isRoundingError()`.  There is no test code with large values to explore its behavior further and determine its limits.
 <br/><br/><br/>
 
 ## 4.2 Major
