@@ -150,7 +150,7 @@ None. This is a design decision with no impact on security.
 
 ### Use `enum` for error codes [[issues/105]](https://github.com/0xProject/contracts/issues/105)
 
-From [contracts/Exchange.sol#L29](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Exchange.sol#L29) onwards, error codes are declared as 8-bit constants. However, it is advisable you do that with an `enum` type as per Solidity specs.
+From [contracts/Exchange.sol#L29](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Exchange.sol#L29) onwards, error codes are declared as 8-bit constants. However, it is advisable that this is accomplished instead with an `enum` type as per Solidity specs.
 
 **Recommendation**
 
