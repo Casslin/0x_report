@@ -176,7 +176,7 @@ Thoroughly test both functions, including when the rounding error is exactly 10/
 
 **Resolution**
 
-0x implemented tests for both [isRoundingError and getPartialAmount](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L168), but did not determine any limits and had less than 10 tests total for both.
+9 total tests were added for both [`isRoundingError()` and `getPartialAmount()`](https://github.com/0xProject/contracts/blob/74728c404a1c7e9091074bd88abf454fd374228a/test/ts/exchange/helpers.ts#L81-L168).  There were no tests to determine any limits to the functions and when their behaviors are no longer reliable.
 <br/><br/><br/>
 
 ### Redesign of the timelock pattern in custom MultiSig contract [[issues/94]](https://github.com/0xProject/contracts/issues/94)
