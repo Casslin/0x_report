@@ -253,7 +253,7 @@ and compile it  with the version listed (v0.4.10+commit.f0d539ae)  with optimize
 
 TODO go to
 https://etherscan.io/address/0xD76b5c2A23ef78368d8E34288B5b65D616B746aE#code
-and compile it the version listed (v0.4.11+commit.68ef5810)  with optimizer enabled.  It would be safer to avoid the optimizer, but this is what was used for the contract that's currently holding 19,000+ ETH.
+and compile it the version listed (v0.4.11+commit.68ef5810)  with optimizer enabled.  It would be safer to avoid the optimizer, but the optimzer was used for the [audited](https://medium.com/@yudilevi/bancor-contracts-audited-and-deployed-54157fcc0a61) contract that's currently holding 19,000+ ETH.
 <br/><br/><br/>
 
 
