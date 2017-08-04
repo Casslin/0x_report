@@ -23,7 +23,7 @@ A trivial case is `target` values >= 1000 will never indicate a rounding error: 
 
 2. Implement the function using the standard definition of [approximation error](https://en.wikipedia.org/wiki/Approximation_error).
 
-3. Thoroughly test `isRoundingError`, including when the rounding error is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000. Push `isRoundingError` to determine its limits, for example rounding errors at 1e27/1e30, (1e27-1)/1e30, (1e27+1)/1e30 and beyond.
+3. Thoroughly test `isRoundingError` [[issues/92]](https://github.com/0xProject/contracts/issues/92), including when the rounding error is exactly 10/10000 (0.1%), below at 9/10000, and above at 11/10000. Push `isRoundingError` to determine its limits, for example rounding errors at 1e27/1e30, (1e27-1)/1e30, (1e27+1)/1e30 and beyond.
 
 **Resolution**
 
