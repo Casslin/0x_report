@@ -56,7 +56,7 @@ Our review found a lack of specifications and documentation, without which we ar
 
 The primary documentation we received was the white paper which did not cover many of the interactions and components of the system. For example, the [critical issue of rounding](../report/4_specific_findings.md#41-critical) lacks a specification and originally had [no tests](https://github.com/0xProject/contracts/issues/92).
 
-Another example is the [Token Distribution contract](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol). Furthermore, it may be preferable for the system to be more codified and deterministic than being dependent on centralized actions such as where the timing is essentially arbitrary.
+Another example is the [Token Distribution contract](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/TokenDistributionWithRegistry.sol). We have written up some descriptions in the Overview and Appendix to provide readers with more context.
 <br/><br/><br/>
 
 ### Rounding of numbers
