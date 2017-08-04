@@ -125,7 +125,7 @@ Lock the pragmas to a specific version in all contracts that will be deployed.
 
 ### `ecrecover()` issue in `solidity <0.4.14`
 
-An issue with the implementation of `ecrecover()` solidity compiler was recently discovered. As Christian Reitwießner [explained](https://www.reddit.com/r/ethereum/comments/6qph9k/solidity_0414_released_security_bugfix_related_to/):
+An issue with the implementation of `ecrecover()` in the Solidity compiler was recently fixed on July 31. As Christian Reitwießner [explained](https://www.reddit.com/r/ethereum/comments/6qph9k/solidity_0414_released_security_bugfix_related_to/):
 
 > Some inputs (invalid v value, for example) are considered invalid by the ecrecover precompiled contract. In these situations, it returns the empty byte array instead of an address. Due to the architecture of the EVM, the caller cannot detect whether the precompiled contract returned the empyt byte array or an actual address (this will change in Metropolis). If the precompiled contract returns the empty byte array, nothing is written to memory and whatever was there before stays there. If you just ignore these situations, then this memory content will be the return value of the Solidity ecrecover function. The compiler tried to zero out this memory area before the call since 0.4.0, but this protective measure turned out to be ineffective.
 
