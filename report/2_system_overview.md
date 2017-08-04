@@ -24,7 +24,7 @@ The basic flow for completing an order is:
 * A `maker` signs a message creating an order according to the protocol specification. This message specifies the parameters of the order, including the token pair (`makerToken` and `takerToken`) and the corresponding amounts to be traded.   Optionally, a `taker` address may be specified, which will ensure that only that address can fill the order.
 * This order and signature can then be communicated off chain, by any means. The expectations is that 'Relayers' will maintain an order book with a list of orders. In order to be compensated for their services, Relayers may choose to list only orders which specify their address as a `feeRecipient`, along with a `takerFee` and/or `makerFee`, which must be paid in the 0x Protocol token (**ZRX**), this is a key element in the utility of the token.
 * _NOTE: Everything up until this point is done off-chain._
-* A `taker` who wishes to fill the order may then submit the parameters of the order and its signature to the `Exchange` contract. If both parties have sufficient transferrable balances of their respective tokens (and `ZRX`), the `Exchange` will complete the transfer. Otherwise the call will error.
+* A `taker` who wishes to fill the order may then submit the parameters of the order and its signature to the `Exchange` contract. If both parties have sufficient transferable balances of their respective tokens (and `ZRX`), the `Exchange` will complete the transfer. Otherwise the call will error.
 * Several different functions are available, which provide a `taker` with various options for filling one or more maker orders: `fillOrder()`, `fillOrKillOrder()`, `batchFillOrders()`, `batchFillOrKillOrders()`, `fillOrdersUpTo()`. It is important to note that the `taker` bears the full gas cost of execution, and risks losing their gas payment if a transaction is an error.
 * `makers` may also cancel previously signed orders by calling `cancelOrder()`, or `batchCancelOrders()`.
 * If an order has an amount either `filled`, or `cancelled`, the amount is recorded in the corresponding `mapping (bytes32 => uint)`. This is essential for preventing a maker's order from being filled more than once, or filled after cancellation.
@@ -71,7 +71,7 @@ The mechanism of the sale looks like this:
 * There is also a `capPerAddress` value which increases with time during the sale. Initially, the maximum contribution amount will be set low enough so that all registered addresses can contribute, and over time this will increase until the full value of the `ZRX` token offering has been distributed. The same address can contribute multiple times up, so long as it does not exceed the current `capPerAddress` value.
 
 
-_After our intial review, this contract was renamed to `TokenSale` for clarity._
+_After our initial review, this contract was renamed to `TokenSale` for clarity._
 
 ## `MultiSigWalletWithTimeLockExceptRemoveAuthorizedAddress`
 

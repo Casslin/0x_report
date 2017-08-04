@@ -6,11 +6,9 @@
 
 ### Source code 
 
-The code base reviewed was the *frozen* branch in the  [0xProject/contracts](https://github.com/0xProject/contracts/tree/888d5a02573572240f4c55e03238be603c13c469) repository.
+The code base reviewed was in the [0xProject/contracts](https://github.com/0xProject/contracts/tree/888d5a02573572240f4c55e03238be603c13c469) repository, with commit hash `888d5a02573572240f4c55e03238be603c13c469`.
 
-The state of the source code at the time of the review can be found under the commit hash [`888d5a02573572240f4c55e03238be603c13c469`](https://github.com/0xProject/contracts/tree/888d5a02573572240f4c55e03238be603c13c469).
-
-Revisions made after the review can be found in the *frozenUpdated* branch under **SPECIFIC COMMIT HASH**.
+Revisions made after the initial review, can be found in the `frozenUpdated` branch at commit hash `74728c404a1c7e9091074bd88abf454fd374228a`.
 
 ### Documentation
 
