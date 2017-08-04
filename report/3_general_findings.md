@@ -43,8 +43,6 @@ Additionally, given the nature of blockchains, miners are not the only ones able
 
 Front running on the blockchain is a difficult problem. Based on our discussions with 0x, it is clear that they have put considerable thought into mechanisms for mitigating and reducing the impact of front running.
 
-We cannot attest to how
-
 <br/><br/><br/>
 
 
