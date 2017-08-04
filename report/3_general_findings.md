@@ -31,7 +31,7 @@ The use of `require` checks on all token transfers however is reassuring, as it 
 
 
 
-### 3.2.2 Front Running
+### Front Running
 
 Miners have ultimate control over transaction ordering and inclusion of transactions on the Ethereum Blockchain. This means that miners are ultimately able to decide which transactions are filled or canceled. Given this inherent power of miners it opens up a possible form of market manipulation: Front running. Front running is the practice of entering into a trade with knowledge of a transaction that will influence the price of the underlying asset or security.
 
@@ -46,7 +46,7 @@ Although it is difficult to solve front running problems on a blockchain, 0x has
 
 
 
-### 3.2.3 Lack of specifications and documentation
+### Lack of specifications and documentation
 
 Ref: [Best Practices: specifications and documentation](https://github.com/ConsenSys/smart-contract-best-practices#security-related-documentation-and-procedures)
 
@@ -57,7 +57,7 @@ Another example is the [Token Distribution contract](https://github.com/0xProjec
 
 
 
-### 3.2.4 Rounding of numbers
+### Rounding of numbers
 
 Given the 0x protocol allows for partial fills, rounding errors are extremely pertinent to the protocol as they can act as a large hidden cost to takers and ultimately result in the loss of tokens. Rounding errors affect "partial fills", ie. when the remainder (`(fillTakerTokenAmount*makerTokenAmount)%takerTokenAmount`) does not equal 0, and increases linearly as the remainder increases. Furthermore, since the EVM does not support floating point numbers rounding errors need to be approximated. However, the precision of this approximation can be increased by multiplying the remainder (i.e - multiplying the remainder by 10 increases the precision by 1 decimal point).
 
@@ -119,20 +119,19 @@ Lock the pragmas to a specific version in all contracts that will be deployed.
 
 
 
-### TODO Keep test contracts separate
+### Keep test contracts separate
 
-TODO
+It is a common, (and good) practice to create contracts external to the contract system for testing purposes. However, these contracts should be kept in a separate directory for clarity.
 
 **Recommendation**
 
-Move test contracts to its separate directory such as `contracts/test` or `test/contracts`.
+Move test contracts to a separate directory such as `contracts/test` or `test/contracts`.
 
 **Resolution**
 
-Test contracts were moved to `contracts/test`.
-TODO
-https://github.com/0xProject/contracts/pull/133/files#diff-879bc9679d7af5c32e07a561199bf7c0
+Fixed. Test contracts were moved to `contracts/test` in [[pull/133]](https://github.com/0xProject/contracts/pull/133/files#diff-879bc9679d7af5c32e07a561199bf7c0).
 
+<br/><br/><br/>
 
 ## 3.4 Minor
 
@@ -162,8 +161,7 @@ The 8-bit constants were indeed substituted for an `enum` type refering all the 
 
 ### Usage of capitalized names for variables
 
-We applaud the attempts to highlight and distinguish the use of certain state variables such as
-https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Exchange.sol#L35-L36
+We applaud the attempts to highlight and distinguish the use of certain state variables such as [`ZRX_TOKEN_CONTRACT`](https://github.com/0xProject/contracts/blob/888d5a02573572240f4c55e03238be603c13c469/contracts/Exchange.sol#L35-L36).
 
 In our opinion, accessing state variables, especially writing to them, should be "highlighted" in code to prevent confusion against local variables.  We strongly encourage the community to improve clarity around state variables. In this instance, we would just note that the Solidity style guide recommends that capitals be used for constants (akin to other languages).
 
